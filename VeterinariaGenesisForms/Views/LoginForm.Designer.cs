@@ -23,106 +23,121 @@ partial class LoginForm
 
     private void InitializeComponent()
     {
-        this.lblTitulo = new Label();
-        this.lblUsuario = new Label();
-        this.lblContrasena = new Label();
-        this.txtUsuario = new TextBox();
-        this.txtContrasena = new TextBox();
-        this.btnLogin = new Button();
-        this.btnCancelar = new Button();
-        this.lblMensaje = new Label();
-        this.SuspendLayout();
-
+        lblTitulo = new Label();
+        lblUsuario = new Label();
+        lblContrasena = new Label();
+        txtUsuario = new TextBox();
+        txtContrasena = new TextBox();
+        btnLogin = new Button();
+        btnCancelar = new Button();
+        lblMensaje = new Label();
+        SuspendLayout();
+        // 
         // lblTitulo
-        this.lblTitulo.AutoSize = true;
-        this.lblTitulo.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
-        this.lblTitulo.Location = new Point(100, 20);
-        this.lblTitulo.Name = "lblTitulo";
-        this.lblTitulo.Size = new Size(280, 30);
-        this.lblTitulo.TabIndex = 0;
-        this.lblTitulo.Text = "Veterinaria Genesis - Login";
-
+        // 
+        lblTitulo.AutoSize = true;
+        lblTitulo.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+        lblTitulo.Location = new Point(114, 27);
+        lblTitulo.Name = "lblTitulo";
+        lblTitulo.Size = new Size(359, 37);
+        lblTitulo.TabIndex = 0;
+        lblTitulo.Text = "Veterinaria Genesis - Login";
+        // 
         // lblUsuario
-        this.lblUsuario.AutoSize = true;
-        this.lblUsuario.Font = new Font("Segoe UI", 10F);
-        this.lblUsuario.Location = new Point(50, 80);
-        this.lblUsuario.Name = "lblUsuario";
-        this.lblUsuario.Size = new Size(120, 19);
-        this.lblUsuario.TabIndex = 1;
-        this.lblUsuario.Text = "Usuario:";
-
-        // txtUsuario
-        this.txtUsuario.Font = new Font("Segoe UI", 10F);
-        this.txtUsuario.Location = new Point(50, 105);
-        this.txtUsuario.Name = "txtUsuario";
-        this.txtUsuario.Size = new Size(380, 25);
-        this.txtUsuario.TabIndex = 2;
-
+        // 
+        lblUsuario.AutoSize = true;
+        lblUsuario.Font = new Font("Segoe UI", 10F);
+        lblUsuario.Location = new Point(57, 107);
+        lblUsuario.Name = "lblUsuario";
+        lblUsuario.Size = new Size(72, 23);
+        lblUsuario.TabIndex = 1;
+        lblUsuario.Text = "Usuario:";
+        // 
         // lblContrasena
-        this.lblContrasena.AutoSize = true;
-        this.lblContrasena.Font = new Font("Segoe UI", 10F);
-        this.lblContrasena.Location = new Point(50, 150);
-        this.lblContrasena.Name = "lblContrasena";
-        this.lblContrasena.Size = new Size(120, 19);
-        this.lblContrasena.TabIndex = 3;
-        this.lblContrasena.Text = "Contraseña:";
-
+        // 
+        lblContrasena.AutoSize = true;
+        lblContrasena.Font = new Font("Segoe UI", 10F);
+        lblContrasena.Location = new Point(57, 200);
+        lblContrasena.Name = "lblContrasena";
+        lblContrasena.Size = new Size(101, 23);
+        lblContrasena.TabIndex = 3;
+        lblContrasena.Text = "Contraseña:";
+        // 
+        // txtUsuario
+        // 
+        txtUsuario.Font = new Font("Segoe UI", 10F);
+        txtUsuario.Location = new Point(57, 140);
+        txtUsuario.Margin = new Padding(3, 4, 3, 4);
+        txtUsuario.Name = "txtUsuario";
+        txtUsuario.Size = new Size(434, 30);
+        txtUsuario.TabIndex = 2;
+        // 
         // txtContrasena
-        this.txtContrasena.Font = new Font("Segoe UI", 10F);
-        this.txtContrasena.Location = new Point(50, 175);
-        this.txtContrasena.Name = "txtContrasena";
-        this.txtContrasena.PasswordChar = '*';
-        this.txtContrasena.Size = new Size(380, 25);
-        this.txtContrasena.TabIndex = 4;
-
+        // 
+        txtContrasena.Font = new Font("Segoe UI", 10F);
+        txtContrasena.Location = new Point(57, 233);
+        txtContrasena.Margin = new Padding(3, 4, 3, 4);
+        txtContrasena.Name = "txtContrasena";
+        txtContrasena.PasswordChar = '*';
+        txtContrasena.Size = new Size(434, 30);
+        txtContrasena.TabIndex = 4;
+        txtContrasena.TextChanged += txtContrasena_TextChanged;
+        // 
         // btnLogin
-        this.btnLogin.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-        this.btnLogin.Location = new Point(50, 230);
-        this.btnLogin.Name = "btnLogin";
-        this.btnLogin.Size = new Size(180, 35);
-        this.btnLogin.TabIndex = 5;
-        this.btnLogin.Text = "&Iniciar Sesión";
-        this.btnLogin.UseVisualStyleBackColor = true;
-        this.btnLogin.Click += new EventHandler(this.btnLogin_Click);
-
+        // 
+        btnLogin.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+        btnLogin.Location = new Point(57, 307);
+        btnLogin.Margin = new Padding(3, 4, 3, 4);
+        btnLogin.Name = "btnLogin";
+        btnLogin.Size = new Size(206, 47);
+        btnLogin.TabIndex = 5;
+        btnLogin.Text = "&Iniciar Sesión";
+        btnLogin.UseVisualStyleBackColor = true;
+        btnLogin.Click += btnLogin_Click;
+        // 
         // btnCancelar
-        this.btnCancelar.Font = new Font("Segoe UI", 10F);
-        this.btnCancelar.Location = new Point(250, 230);
-        this.btnCancelar.Name = "btnCancelar";
-        this.btnCancelar.Size = new Size(180, 35);
-        this.btnCancelar.TabIndex = 6;
-        this.btnCancelar.Text = "&Cancelar";
-        this.btnCancelar.UseVisualStyleBackColor = true;
-        this.btnCancelar.Click += new EventHandler(this.btnCancelar_Click);
-
+        // 
+        btnCancelar.Font = new Font("Segoe UI", 10F);
+        btnCancelar.Location = new Point(286, 307);
+        btnCancelar.Margin = new Padding(3, 4, 3, 4);
+        btnCancelar.Name = "btnCancelar";
+        btnCancelar.Size = new Size(206, 47);
+        btnCancelar.TabIndex = 6;
+        btnCancelar.Text = "&Cancelar";
+        btnCancelar.UseVisualStyleBackColor = true;
+        btnCancelar.Click += btnCancelar_Click;
+        // 
         // lblMensaje
-        this.lblMensaje.AutoSize = true;
-        this.lblMensaje.Font = new Font("Segoe UI", 9F);
-        this.lblMensaje.Location = new Point(50, 290);
-        this.lblMensaje.Name = "lblMensaje";
-        this.lblMensaje.Size = new Size(0, 15);
-        this.lblMensaje.TabIndex = 7;
-
+        // 
+        lblMensaje.AutoSize = true;
+        lblMensaje.Font = new Font("Segoe UI", 9F);
+        lblMensaje.Location = new Point(57, 387);
+        lblMensaje.Name = "lblMensaje";
+        lblMensaje.Size = new Size(0, 20);
+        lblMensaje.TabIndex = 7;
+        // 
         // LoginForm
-        this.AutoScaleDimensions = new SizeF(7F, 15F);
-        this.AutoScaleMode = AutoScaleMode.Font;
-        this.ClientSize = new Size(480, 330);
-        this.Controls.Add(this.lblMensaje);
-        this.Controls.Add(this.btnCancelar);
-        this.Controls.Add(this.btnLogin);
-        this.Controls.Add(this.txtContrasena);
-        this.Controls.Add(this.lblContrasena);
-        this.Controls.Add(this.txtUsuario);
-        this.Controls.Add(this.lblUsuario);
-        this.Controls.Add(this.lblTitulo);
-        this.FormBorderStyle = FormBorderStyle.FixedDialog;
-        this.MaximizeBox = false;
-        this.MinimizeBox = false;
-        this.Name = "LoginForm";
-        this.StartPosition = FormStartPosition.CenterScreen;
-        this.Text = "Login - Veterinaria Genesis";
-        this.ResumeLayout(false);
-        this.PerformLayout();
+        // 
+        AutoScaleDimensions = new SizeF(8F, 20F);
+        AutoScaleMode = AutoScaleMode.Font;
+        ClientSize = new Size(549, 440);
+        Controls.Add(lblMensaje);
+        Controls.Add(btnCancelar);
+        Controls.Add(btnLogin);
+        Controls.Add(txtContrasena);
+        Controls.Add(lblContrasena);
+        Controls.Add(txtUsuario);
+        Controls.Add(lblUsuario);
+        Controls.Add(lblTitulo);
+        FormBorderStyle = FormBorderStyle.FixedDialog;
+        Margin = new Padding(3, 4, 3, 4);
+        MaximizeBox = false;
+        MinimizeBox = false;
+        Name = "LoginForm";
+        StartPosition = FormStartPosition.CenterScreen;
+        Text = "Login - Veterinaria Genesis";
+        ResumeLayout(false);
+        PerformLayout();
     }
 }
 

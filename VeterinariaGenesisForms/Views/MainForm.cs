@@ -42,9 +42,23 @@ public partial class MainForm : Form
         {
             bool esAdmin = _usuario.NombreRol == "Administrador";
             bool esVeterinario = _usuario.NombreRol == "Veterinario" || esAdmin;
+            bool esRecepcionista = _usuario.NombreRol == "Recepcionista";
 
-            // Habilitar/deshabilitar opciones según el rol
+            // El menú Gestión está disponible para todos los roles
+            mnuGestion.Enabled = true;
+            
+            // Los reportes solo para Admin y Veterinario
             mnuReportes.Enabled = esAdmin || esVeterinario;
+            
+            // El menú Usuario siempre está disponible
+            mnuUsuario.Enabled = true;
+        }
+        else
+        {
+            // Si no hay usuario, habilitar todo (por si acaso)
+            mnuGestion.Enabled = true;
+            mnuReportes.Enabled = true;
+            mnuUsuario.Enabled = true;
         }
     }
 

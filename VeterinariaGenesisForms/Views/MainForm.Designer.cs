@@ -5,8 +5,16 @@ partial class MainForm
 {
     private System.ComponentModel.IContainer? components = null;
     private MenuStrip menuStrip1 = null!;
+    private ToolStripMenuItem mnuGestion = null!;
+    private ToolStripMenuItem mnuPropietarios = null!;
+    private ToolStripMenuItem mnuMascotas = null!;
+    private ToolStripMenuItem mnuCitas = null!;
+    private ToolStripMenuItem mnuFacturas = null!;
     private ToolStripMenuItem mnuReportes = null!;
     private ToolStripMenuItem mnuReportePropietarios = null!;
+    private ToolStripMenuItem mnuReporteServiciosVendidos = null!;
+    private ToolStripMenuItem mnuReporteCitasPorVeterinario = null!;
+    private ToolStripMenuItem mnuReporteIngresosPorPeriodo = null!;
     private ToolStripMenuItem mnuUsuario = null!;
     private ToolStripMenuItem mnuCerrarSesion = null!;
     private ToolStripMenuItem mnuSalir = null!;
@@ -25,8 +33,16 @@ partial class MainForm
     private void InitializeComponent()
     {
         menuStrip1 = new MenuStrip();
+        mnuGestion = new ToolStripMenuItem();
+        mnuPropietarios = new ToolStripMenuItem();
+        mnuMascotas = new ToolStripMenuItem();
+        mnuCitas = new ToolStripMenuItem();
+        mnuFacturas = new ToolStripMenuItem();
         mnuReportes = new ToolStripMenuItem();
         mnuReportePropietarios = new ToolStripMenuItem();
+        mnuReporteServiciosVendidos = new ToolStripMenuItem();
+        mnuReporteCitasPorVeterinario = new ToolStripMenuItem();
+        mnuReporteIngresosPorPeriodo = new ToolStripMenuItem();
         mnuUsuario = new ToolStripMenuItem();
         mnuCerrarSesion = new ToolStripMenuItem();
         mnuSalir = new ToolStripMenuItem();
@@ -39,7 +55,7 @@ partial class MainForm
         // menuStrip1
         // 
         menuStrip1.ImageScalingSize = new Size(20, 20);
-        menuStrip1.Items.AddRange(new ToolStripItem[] { mnuReportes, mnuUsuario });
+        menuStrip1.Items.AddRange(new ToolStripItem[] { mnuGestion, mnuReportes, mnuUsuario });
         menuStrip1.Location = new Point(0, 0);
         menuStrip1.Name = "menuStrip1";
         menuStrip1.Padding = new Padding(7, 3, 0, 3);
@@ -47,9 +63,44 @@ partial class MainForm
         menuStrip1.TabIndex = 0;
         menuStrip1.Text = "menuStrip1";
         // 
+        // mnuGestion
+        // 
+        mnuGestion.DropDownItems.AddRange(new ToolStripItem[] { mnuPropietarios, mnuMascotas, mnuCitas, mnuFacturas });
+        mnuGestion.Name = "mnuGestion";
+        mnuGestion.Size = new Size(75, 24);
+        mnuGestion.Text = "&Gestión";
+        // 
+        // mnuPropietarios
+        // 
+        mnuPropietarios.Name = "mnuPropietarios";
+        mnuPropietarios.Size = new Size(180, 26);
+        mnuPropietarios.Text = "&Propietarios";
+        mnuPropietarios.Click += mnuPropietarios_Click;
+        // 
+        // mnuMascotas
+        // 
+        mnuMascotas.Name = "mnuMascotas";
+        mnuMascotas.Size = new Size(180, 26);
+        mnuMascotas.Text = "&Mascotas";
+        mnuMascotas.Click += mnuMascotas_Click;
+        // 
+        // mnuCitas
+        // 
+        mnuCitas.Name = "mnuCitas";
+        mnuCitas.Size = new Size(180, 26);
+        mnuCitas.Text = "&Citas";
+        mnuCitas.Click += mnuCitas_Click;
+        // 
+        // mnuFacturas
+        // 
+        mnuFacturas.Name = "mnuFacturas";
+        mnuFacturas.Size = new Size(180, 26);
+        mnuFacturas.Text = "&Facturas";
+        mnuFacturas.Click += mnuFacturas_Click;
+        // 
         // mnuReportes
         // 
-        mnuReportes.DropDownItems.AddRange(new ToolStripItem[] { mnuReportePropietarios });
+        mnuReportes.DropDownItems.AddRange(new ToolStripItem[] { mnuReportePropietarios, mnuReporteServiciosVendidos, mnuReporteCitasPorVeterinario, mnuReporteIngresosPorPeriodo });
         mnuReportes.Name = "mnuReportes";
         mnuReportes.Size = new Size(82, 24);
         mnuReportes.Text = "&Reportes";
@@ -60,6 +111,27 @@ partial class MainForm
         mnuReportePropietarios.Size = new Size(250, 26);
         mnuReportePropietarios.Text = "Reporte de &Propietarios";
         mnuReportePropietarios.Click += mnuReportePropietarios_Click;
+        // 
+        // mnuReporteServiciosVendidos
+        // 
+        mnuReporteServiciosVendidos.Name = "mnuReporteServiciosVendidos";
+        mnuReporteServiciosVendidos.Size = new Size(250, 26);
+        mnuReporteServiciosVendidos.Text = "Servicios &Vendidos";
+        mnuReporteServiciosVendidos.Click += mnuReporteServiciosVendidos_Click;
+        // 
+        // mnuReporteCitasPorVeterinario
+        // 
+        mnuReporteCitasPorVeterinario.Name = "mnuReporteCitasPorVeterinario";
+        mnuReporteCitasPorVeterinario.Size = new Size(250, 26);
+        mnuReporteCitasPorVeterinario.Text = "Citas por &Veterinario";
+        mnuReporteCitasPorVeterinario.Click += mnuReporteCitasPorVeterinario_Click;
+        // 
+        // mnuReporteIngresosPorPeriodo
+        // 
+        mnuReporteIngresosPorPeriodo.Name = "mnuReporteIngresosPorPeriodo";
+        mnuReporteIngresosPorPeriodo.Size = new Size(250, 26);
+        mnuReporteIngresosPorPeriodo.Text = "&Ingresos por Período";
+        mnuReporteIngresosPorPeriodo.Click += mnuReporteIngresosPorPeriodo_Click;
         // 
         // mnuUsuario
         // 

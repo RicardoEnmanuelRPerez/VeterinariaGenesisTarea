@@ -9,7 +9,7 @@ public class ApiClient
 {
     private readonly HttpClient _httpClient;
     private string? _bearerToken;
-    private const string BaseUrl = "https://localhost:7241/api"; // Ajusta según tu configuración
+    private const string BaseUrl = "https://localhost:7241/api/"; // Ajusta según tu configuración
 
     public ApiClient()
     {

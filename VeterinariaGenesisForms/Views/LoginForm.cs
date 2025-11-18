@@ -21,17 +21,17 @@ public partial class LoginForm : Form
     {
         // Colores profesionales para veterinaria
         this.BackColor = Color.FromArgb(245, 250, 247); // Verde muy suave
-        
+
         // Título con color verde
         lblTitulo.ForeColor = Color.FromArgb(27, 94, 32); // Verde oscuro
-        
+
         // Botón de login con color verde
         btnLogin.BackColor = Color.FromArgb(76, 175, 80); // Verde
         btnLogin.ForeColor = Color.White;
         btnLogin.FlatStyle = FlatStyle.Flat;
         btnLogin.FlatAppearance.BorderSize = 0;
         btnLogin.FlatAppearance.MouseOverBackColor = Color.FromArgb(69, 160, 73); // Verde más oscuro al pasar el mouse
-        
+
         // Botón cancelar con color gris
         btnCancelar.BackColor = Color.FromArgb(158, 158, 158); // Gris
         btnCancelar.ForeColor = Color.White;
@@ -84,6 +84,11 @@ public partial class LoginForm : Form
     {
         DialogResult = DialogResult.Cancel;
         Close();
+    }
+
+    private void txtContrasena_TextChanged(object sender, EventArgs e)
+    {
+
     }
 }
 
