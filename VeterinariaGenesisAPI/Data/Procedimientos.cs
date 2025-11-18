@@ -28,5 +28,15 @@ public static class Procedimientos
     public const string Factura_CrearDesdeCita = "sp_Factura_CrearDesdeCita";
     public const string Factura_AgregarItem = "sp_Factura_AgregarItem";
     public const string Factura_Pagar = "sp_Factura_Pagar";
+
+    // Stored Procedures de Reportes
+    public const string Reporte_Propietarios = "sp_Reporte_Propietarios";
+    public const string Reporte_ServiciosVendidos = "sp_Reporte_ServiciosVendidos";
+    public const string Reporte_CitasPorVeterinario = "sp_Reporte_CitasPorVeterinario";
+    public const string Reporte_IngresosPorPeriodo = "sp_Reporte_IngresosPorPeriodo";
+    public const string Reporte_MascotasPorEspecie = "sp_Reporte_MascotasPorEspecie";
+    public const string Reporte_TratamientosComunes = "sp_Reporte_TratamientosComunes";
+    public const string Reporte_MetodosPago = "sp_Reporte_MetodosPago";
+    public const string Reporte_ResumenGeneral = "sp_Reporte_ResumenGeneral";
 }
 

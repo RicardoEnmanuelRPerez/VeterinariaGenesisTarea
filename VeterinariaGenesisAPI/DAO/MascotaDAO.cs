@@ -57,6 +57,35 @@ public class MascotaDAO : IMascotaDAO
         await command.ExecuteNonQueryAsync();
     }
 
+    public async Task EliminarAsync(int id)
+    {
+        await using var connection = _conexionDB.GetConnection();
+        await connection.OpenAsync();
+
+        // Verificar si la mascota tiene citas asociadas
+        await using var checkCommand = new SqlCommand(
+            "SELECT COUNT(*) FROM Cita WHERE ID_Mascota = @ID_Mascota", 
+            connection);
+        checkCommand.Parameters.Add(new SqlParameter("@ID_Mascota", SqlDbType.Int) { Value = id });
+        
+        var citasCount = (int)await checkCommand.ExecuteScalarAsync();
+        
+        if (citasCount > 0)
+        {
+            throw new InvalidOperationException(
+                $"No se puede eliminar la mascota porque tiene {citasCount} cita(s) asociada(s). " +
+                "Primero debe cancelar o completar las citas.");
+        }
+
+        // Eliminar la mascota (las citas se eliminan en cascada si existieran)
+        await using var deleteCommand = new SqlCommand(
+            "DELETE FROM Mascota WHERE ID_Mascota = @ID_Mascota", 
+            connection);
+        deleteCommand.Parameters.Add(new SqlParameter("@ID_Mascota", SqlDbType.Int) { Value = id });
+        
+        await deleteCommand.ExecuteNonQueryAsync();
+    }
+
     public async Task<List<MascotaDto>> ListarPorPropietarioAsync(int idPropietario)
     {
         var resultados = new List<MascotaDto>();

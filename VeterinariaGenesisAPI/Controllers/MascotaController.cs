@@ -117,6 +117,33 @@ public class MascotaController : ControllerBase
             return StatusCode(500, new { message = "Error interno del servidor" });
         }
     }
+
+    /// <summary>
+    /// Elimina una mascota
+    /// </summary>
+    [HttpDelete("{id}")]
+    [Authorize(Policy = "AdministradorOrVeterinario")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Eliminar(int id)
+    {
+        try
+        {
+            await _mascotaService.EliminarAsync(id);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Error de negocio al eliminar mascota: {Id}", id);
+            return Conflict(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al eliminar mascota: {Id}", id);
+            return StatusCode(500, new { message = "Error interno del servidor" });
+        }
+    }
 }
 
 

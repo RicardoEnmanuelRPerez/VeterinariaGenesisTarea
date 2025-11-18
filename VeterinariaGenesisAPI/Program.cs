@@ -61,6 +61,7 @@ builder.Services.AddScoped<IPropietarioDAO, PropietarioDAO>();
 builder.Services.AddScoped<IMascotaDAO, MascotaDAO>();
 builder.Services.AddScoped<ICitaDAO, CitaDAO>();
 builder.Services.AddScoped<IFacturaDAO, FacturaDAO>();
+builder.Services.AddScoped<IReporteDAO, ReporteDAO>();
 
 // Register Services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -68,6 +69,7 @@ builder.Services.AddScoped<IPropietarioService, PropietarioService>();
 builder.Services.AddScoped<IMascotaService, MascotaService>();
 builder.Services.AddScoped<ICitaService, CitaService>();
 builder.Services.AddScoped<IFacturaService, FacturaService>();
+builder.Services.AddScoped<IReporteService, ReporteService>();
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
