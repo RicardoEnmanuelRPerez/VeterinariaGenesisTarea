@@ -98,3 +98,78 @@ public class ReporteResumenGeneralDto
     public int TotalTratamientos { get; set; }
 }
 
+// DTO para Historial Clínico
+public class HistorialClinicoDto
+{
+    public string TipoEvento { get; set; } = string.Empty;
+    public string ID_Evento { get; set; } = string.Empty;
+    public DateTime Fecha { get; set; }
+    public TimeSpan? Hora { get; set; }
+    public string Descripcion { get; set; } = string.Empty;
+    public string? Veterinario { get; set; }
+    public decimal? Costo { get; set; }
+    public string? Estado { get; set; }
+    public string? Observaciones { get; set; }
+}
+
+public class MascotaBusquedaDto
+{
+    public int ID_Mascota { get; set; }
+    public string NombreMascota { get; set; } = string.Empty;
+    public string Especie { get; set; } = string.Empty;
+    public string? Raza { get; set; }
+    public int? Edad { get; set; }
+    public int ID_Propietario { get; set; }
+    public string NombrePropietario { get; set; } = string.Empty;
+    public string? Telefono { get; set; }
+    public string? Direccion { get; set; }
+}
+
+// DTO para Dashboard
+public class DashboardCirugiasDto
+{
+    public int ID_Veterinario { get; set; }
+    public string NombreVeterinario { get; set; } = string.Empty;
+    public string? Especialidad { get; set; }
+    public int CantidadCirugias { get; set; }
+    public decimal PorcentajeTotal { get; set; }
+}
+
+public class DashboardCitasDiaSemanaDto
+{
+    public string DiaSemana { get; set; } = string.Empty;
+    public int CantidadCitas { get; set; }
+    public int CitasCompletadas { get; set; }
+    public int CitasCanceladas { get; set; }
+}
+
+public class DashboardProductividadDto
+{
+    public int ID_Veterinario { get; set; }
+    public string NombreVeterinario { get; set; } = string.Empty;
+    public string? Especialidad { get; set; }
+    public int TotalCitas { get; set; }
+    public int TotalCirugias { get; set; }
+    public int TotalTratamientos { get; set; }
+    public decimal IngresosGenerados { get; set; }
+}
+
+// DTO para Recordatorios de Vacunación
+public class RecordatorioVacunacionDto
+{
+    public int ID_Mascota { get; set; }
+    public string NombreMascota { get; set; } = string.Empty;
+    public string Especie { get; set; } = string.Empty;
+    public string? Raza { get; set; }
+    public int ID_Propietario { get; set; }
+    public string NombrePropietario { get; set; } = string.Empty;
+    public string? Telefono { get; set; }
+    public string? Direccion { get; set; }
+    public string NombreVacuna { get; set; } = string.Empty;
+    public string? Dosis { get; set; }
+    public DateTime FechaAplicacion { get; set; }
+    public DateTime? FechaProximaDosis { get; set; }
+    public string Estado { get; set; } = string.Empty;
+    public int? DiasRestantes { get; set; }
+}
+

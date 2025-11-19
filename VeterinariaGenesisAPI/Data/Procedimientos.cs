@@ -54,5 +54,17 @@ public static class Procedimientos
     public const string Reporte_TratamientosComunes = "sp_Reporte_TratamientosComunes";
     public const string Reporte_MetodosPago = "sp_Reporte_MetodosPago";
     public const string Reporte_ResumenGeneral = "sp_Reporte_ResumenGeneral";
+
+    // Stored Procedures de Historial Clínico
+    public const string Historial_ObtenerPorMascota = "sp_Historial_ObtenerPorMascota";
+    public const string Mascota_BuscarParaHistorial = "sp_Mascota_BuscarParaHistorial";
+
+    // Stored Procedures de Dashboard
+    public const string Dashboard_CirugiasPorVeterinario = "sp_Dashboard_CirugiasPorVeterinario";
+    public const string Dashboard_CitasPorDiaSemana = "sp_Dashboard_CitasPorDiaSemana";
+    public const string Dashboard_ProductividadVeterinario = "sp_Dashboard_ProductividadVeterinario";
+
+    // Stored Procedures de Vacunación
+    public const string Vacuna_Recordatorios = "sp_Vacuna_Recordatorios";
 }
 

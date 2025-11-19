@@ -211,6 +211,36 @@ public partial class MainForm : Form
         AbrirFormulario(() => new PagoFacturaForm(_facturaRepository));
     }
 
+    // Menú Historial Clínico
+    private void mnuHistorialClinico_Click(object? sender, EventArgs e)
+    {
+        AbrirFormulario(() =>
+        {
+            var historialRepository = new HistorialRepository(_apiClient);
+            return new HistorialClinicoForm(historialRepository);
+        });
+    }
+
+    // Menú Dashboard Veterinario
+    private void mnuDashboardVeterinario_Click(object? sender, EventArgs e)
+    {
+        AbrirFormulario(() =>
+        {
+            var dashboardRepository = new DashboardRepository(_apiClient);
+            return new DashboardVeterinarioForm(dashboardRepository);
+        });
+    }
+
+    // Menú Recordatorios Vacunación
+    private void mnuRecordatoriosVacunacion_Click(object? sender, EventArgs e)
+    {
+        AbrirFormulario(() =>
+        {
+            var vacunaRepository = new VacunaRepository(_apiClient);
+            return new RecordatoriosVacunacionForm(vacunaRepository);
+        });
+    }
+
     // Menú Reportes
     private void mnuReportePropietarios_Click(object? sender, EventArgs e)
     {

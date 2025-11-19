@@ -186,9 +186,21 @@ public partial class CitasForm : Form
             _citas = await _citaRepository.ListarPorFechaAsync(dtpFechaBuscar.Value);
             dgvCitas.DataSource = _citas;
             ConfigurarDataGridView();
+            
+            // Aplicar colores según estado
+            AplicarColoresPorEstado();
 
-            lblEstadoMensaje.Text = $"Se encontraron {_citas.Count} citas para la fecha seleccionada";
-            lblEstadoMensaje.ForeColor = Color.Green;
+            // Manejo de "Sin Resultados"
+            if (_citas.Count == 0)
+            {
+                lblEstadoMensaje.Text = $"No se encontraron citas para la fecha {dtpFechaBuscar.Value:dd/MM/yyyy}";
+                lblEstadoMensaje.ForeColor = Color.Orange;
+            }
+            else
+            {
+                lblEstadoMensaje.Text = $"Se encontraron {_citas.Count} cita(s) para la fecha seleccionada";
+                lblEstadoMensaje.ForeColor = Color.Green;
+            }
         }
         catch (Exception ex)
         {
@@ -210,6 +222,36 @@ public partial class CitasForm : Form
         dgvCitas.ReadOnly = true;
         dgvCitas.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         dgvCitas.SelectionChanged += DgvCitas_SelectionChanged;
+    }
+
+    private void AplicarColoresPorEstado()
+    {
+        foreach (DataGridViewRow row in dgvCitas.Rows)
+        {
+            if (row.DataBoundItem is CitaDto cita)
+            {
+                // Colorear según estado
+                switch (cita.Estado?.ToUpper())
+                {
+                    case "COMPLETADA":
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(200, 230, 201); // Verde claro
+                        row.DefaultCellStyle.ForeColor = Color.FromArgb(27, 94, 32); // Verde oscuro
+                        break;
+                    case "CANCELADA":
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(255, 235, 238); // Rojo claro
+                        row.DefaultCellStyle.ForeColor = Color.FromArgb(198, 40, 40); // Rojo oscuro
+                        break;
+                    case "PROGRAMADA":
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(255, 243, 224); // Amarillo/Naranja claro
+                        row.DefaultCellStyle.ForeColor = Color.FromArgb(230, 126, 34); // Naranja oscuro
+                        break;
+                    default:
+                        row.DefaultCellStyle.BackColor = Color.White;
+                        row.DefaultCellStyle.ForeColor = Color.Black;
+                        break;
+                }
+            }
+        }
     }
 
     private void DgvCitas_SelectionChanged(object? sender, EventArgs e)
