@@ -34,22 +34,22 @@ public partial class DashboardVeterinarioForm : Form
     private void AplicarColoresVeterinaria()
     {
         this.BackColor = Color.FromArgb(240, 248, 255);
-        
+
         gbxFiltros.BackColor = Color.FromArgb(255, 255, 255);
         gbxCirugias.BackColor = Color.FromArgb(255, 255, 255);
         gbxCitas.BackColor = Color.FromArgb(255, 255, 255);
         gbxProductividad.BackColor = Color.FromArgb(255, 255, 255);
-        
+
         btnGenerar.BackColor = Color.FromArgb(76, 175, 80);
         btnGenerar.ForeColor = Color.White;
         btnGenerar.FlatStyle = FlatStyle.Flat;
         btnGenerar.FlatAppearance.BorderSize = 0;
-        
+
         btnExportarExcel.BackColor = Color.FromArgb(76, 175, 80);
         btnExportarExcel.ForeColor = Color.White;
         btnExportarExcel.FlatStyle = FlatStyle.Flat;
         btnExportarExcel.FlatAppearance.BorderSize = 0;
-        
+
         // DataGridViews
         dgvCirugias.BackgroundColor = Color.FromArgb(250, 250, 250);
         dgvCirugias.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 248, 255);
@@ -57,7 +57,7 @@ public partial class DashboardVeterinarioForm : Form
         dgvCirugias.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
         dgvCirugias.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
         dgvCirugias.EnableHeadersVisualStyles = false;
-        
+
         dgvProductividad.BackgroundColor = Color.FromArgb(250, 250, 250);
         dgvProductividad.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 248, 255);
         dgvProductividad.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(33, 150, 243);
@@ -72,12 +72,12 @@ public partial class DashboardVeterinarioForm : Form
         dgvCirugias.AllowUserToAddRows = false;
         dgvCirugias.ReadOnly = true;
         dgvCirugias.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        
+
         dgvProductividad.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
         dgvProductividad.AllowUserToAddRows = false;
         dgvProductividad.ReadOnly = true;
         dgvProductividad.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-        
+
         if (dgvProductividad.Columns["IngresosGenerados"] != null)
             dgvProductividad.Columns["IngresosGenerados"].DefaultCellStyle.Format = "C2";
     }
@@ -257,6 +257,11 @@ public partial class DashboardVeterinarioForm : Form
         {
             Cursor = Cursors.Default;
         }
+    }
+
+    private void lblFechaInicio_Click(object sender, EventArgs e)
+    {
+
     }
 }
 
