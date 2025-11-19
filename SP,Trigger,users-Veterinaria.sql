@@ -443,6 +443,24 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID('sp_Cita_ListarCompletadasSinFactura', 'P') IS NOT NULL DROP PROCEDURE sp_Cita_ListarCompletadasSinFactura;
+GO
+CREATE PROCEDURE sp_Cita_ListarCompletadasSinFactura
+AS
+BEGIN
+    SET NOCOUNT ON;
+    -- Lista solo las citas completadas que NO tienen factura asociada
+    SELECT C.* 
+    FROM vw_AgendaCitas C
+    WHERE C.Estado = 'Completada'
+      AND NOT EXISTS (
+          SELECT 1 FROM Factura F 
+          WHERE F.ID_Cita = C.ID_Cita
+      )
+    ORDER BY C.Fecha DESC, C.Hora DESC;
+END
+GO
+
 PRINT 'SPs CRUD para [Cita] creados.';
 GO
 
@@ -451,6 +469,7 @@ IF OBJECT_ID('sp_Factura_CrearDesdeCita', 'P') IS NOT NULL DROP PROCEDURE sp_Fac
 GO
 CREATE PROCEDURE sp_Factura_CrearDesdeCita
     @ID_Cita INT
+WITH EXECUTE AS OWNER
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -527,45 +546,100 @@ CREATE PROCEDURE sp_Factura_Pagar
     @ID_Factura INT,
     @MontoPagado DECIMAL(10,2),
     @MetodoPago VARCHAR(50)
+WITH EXECUTE AS OWNER
 AS
 BEGIN
     SET NOCOUNT ON;
     DECLARE @TotalFactura DECIMAL(10,2), @ID_Cita INT;
-
-    SELECT @TotalFactura = Total, @ID_Cita = ID_Cita 
-    FROM Factura 
-    WHERE ID_Factura = @ID_Factura AND EstadoPago = 'Pendiente';
-
-    IF @TotalFactura IS NULL
-    BEGIN
-        RAISERROR('Factura no encontrada o ya fue pagada.', 16, 1);
-        RETURN;
-    END
-    IF @MontoPagado < @TotalFactura
-    BEGIN
-        RAISERROR('El monto es insuficiente.', 16, 1);
-        RETURN;
-    END
+    DECLARE @EstadoActual VARCHAR(20);
+    DECLARE @PagosExistentes INT;
+    DECLARE @MensajeEstado NVARCHAR(4000);
+    DECLARE @MensajeMonto NVARCHAR(4000);
 
     BEGIN TRANSACTION;
     BEGIN TRY
+        -- Bloquear la factura con UPDLOCK y HOLDLOCK para evitar condiciones de carrera
+        -- Esto asegura que solo un proceso pueda procesar el pago a la vez
+        SELECT @TotalFactura = Total, @ID_Cita = ID_Cita, @EstadoActual = EstadoPago
+        FROM Factura WITH (UPDLOCK, HOLDLOCK, ROWLOCK)
+        WHERE ID_Factura = @ID_Factura;
+
+        -- Validar que la factura existe
+        IF @TotalFactura IS NULL
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RAISERROR('Factura no encontrada.', 16, 1);
+            RETURN;
+        END
+
+        -- Validar que la factura está pendiente
+        IF @EstadoActual != 'Pendiente'
+        BEGIN
+            ROLLBACK TRANSACTION;
+            SET @MensajeEstado = 'La factura ya fue pagada o está en otro estado. Estado actual: ' + @EstadoActual;
+            RAISERROR(@MensajeEstado, 16, 1);
+            RETURN;
+        END
+
+        -- Verificar si ya existe un pago para esta factura (doble validación)
+        SELECT @PagosExistentes = COUNT(*)
+        FROM Pago
+        WHERE ID_Factura = @ID_Factura;
+
+        IF @PagosExistentes > 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RAISERROR('Esta factura ya tiene un pago registrado. No se pueden procesar pagos duplicados.', 16, 1);
+            RETURN;
+        END
+
+        -- Validar que el monto es suficiente
+        IF @MontoPagado < @TotalFactura
+        BEGIN
+            ROLLBACK TRANSACTION;
+            SET @MensajeMonto = 'El monto es insuficiente. El total de la factura es $' + CAST(@TotalFactura AS VARCHAR(20));
+            RAISERROR(@MensajeMonto, 16, 1);
+            RETURN;
+        END
+
         -- 1. Insertar el Pago
         INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago)
         VALUES (@ID_Factura, @MetodoPago, @MontoPagado, GETDATE());
 
-        -- 2. Actualizar la Factura a 'Pagada'
-        UPDATE Factura SET EstadoPago = 'Pagada' WHERE ID_Factura = @ID_Factura;
+        -- 2. Actualizar la Factura a 'Pagada' (con la misma condición de estado para seguridad)
+        UPDATE Factura 
+        SET EstadoPago = 'Pagada' 
+        WHERE ID_Factura = @ID_Factura 
+          AND EstadoPago = 'Pendiente';  -- Doble verificación para evitar condiciones de carrera
 
-        -- 3. Actualizar la Cita a 'Completada'
+        -- Verificar que se actualizó correctamente
+        IF @@ROWCOUNT = 0
+        BEGIN
+            ROLLBACK TRANSACTION;
+            RAISERROR('Error al actualizar el estado de la factura. La factura puede haber sido pagada por otro proceso.', 16, 1);
+            RETURN;
+        END
+
+        -- 3. Actualizar la Cita a 'Completada' (si tiene cita asociada)
         IF @ID_Cita IS NOT NULL
-            UPDATE Cita SET Estado = 'Completada' WHERE ID_Cita = @ID_Cita;
+        BEGIN
+            UPDATE Cita 
+            SET Estado = 'Completada' 
+            WHERE ID_Cita = @ID_Cita AND Estado != 'Completada';
+        END
 
         COMMIT TRANSACTION;
         SELECT 1 AS Exito;
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        THROW;
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+        
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+        
+        RAISERROR(@ErrorMessage, @ErrorSeverity, @ErrorState);
     END CATCH
 END
 GO
@@ -645,26 +719,51 @@ GO
 PRINT '--- 7. Asignando permisos finales al rol de la API ---';
 
 -- Otorgar permisos de ejecuci�n a TODOS los SPs
-GRANT EXECUTE ON sp_Usuario_Login TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Propietario_Crear TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Propietario_Actualizar TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Propietario_Desactivar TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Propietario_ListarActivos TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Propietario_BuscarPorID TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Mascota_Crear TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Mascota_Actualizar TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Mascota_ListarPorPropietario TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Mascota_BuscarPorID TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Cita_Agendar TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Cita_Cancelar TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Cita_ListarPorFecha TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Cita_ListarPorVeterinario TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Factura_CrearDesdeCita TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Factura_AgregarItem TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Factura_Pagar TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Historial_AgregarTratamiento TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Historial_AgregarVacuna TO rol_api_ejecutor;
-GRANT EXECUTE ON sp_Reporte_HistoriaClinicaCompleta TO rol_api_ejecutor;
+-- Otorgar permisos con verificacin de existencia para evitar errores
+IF OBJECT_ID('sp_Usuario_Login', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Usuario_Login TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Propietario_Crear', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Propietario_Crear TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Propietario_Actualizar', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Propietario_Actualizar TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Propietario_Desactivar', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Propietario_Desactivar TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Propietario_ListarActivos', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Propietario_ListarActivos TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Propietario_BuscarPorID', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Propietario_BuscarPorID TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Mascota_Crear', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Mascota_Crear TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Mascota_Actualizar', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Mascota_Actualizar TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Mascota_ListarPorPropietario', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Mascota_ListarPorPropietario TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Mascota_BuscarPorID', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Mascota_BuscarPorID TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Cita_Agendar', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Cita_Agendar TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Cita_Cancelar', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Cita_Cancelar TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Cita_ListarPorFecha', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Cita_ListarPorFecha TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Cita_ListarPorVeterinario', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Cita_ListarPorVeterinario TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Cita_ListarCompletadasSinFactura', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Cita_ListarCompletadasSinFactura TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Factura_CrearDesdeCita', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Factura_CrearDesdeCita TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Factura_AgregarItem', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Factura_AgregarItem TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Factura_Pagar', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Factura_Pagar TO rol_api_ejecutor;
+ELSE
+    PRINT 'ADVERTENCIA: sp_Factura_Pagar no existe. Verifica que se haya creado correctamente.';
+IF OBJECT_ID('sp_Historial_AgregarTratamiento', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Historial_AgregarTratamiento TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Historial_AgregarVacuna', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Historial_AgregarVacuna TO rol_api_ejecutor;
+IF OBJECT_ID('sp_Reporte_HistoriaClinicaCompleta', 'P') IS NOT NULL
+    GRANT EXECUTE ON sp_Reporte_HistoriaClinicaCompleta TO rol_api_ejecutor;
 -- (A�ade aqu� cualquier SP que falte)
 
 -- Otorgar permisos de lectura a TODAS las Vistas

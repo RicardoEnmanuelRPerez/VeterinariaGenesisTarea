@@ -18,6 +18,11 @@ public class CitaService : ICitaService
         return await _citaDAO.AgendarAsync(dto);
     }
 
+    public async Task ActualizarAsync(CitaUpdateDto dto)
+    {
+        await _citaDAO.ActualizarAsync(dto);
+    }
+
     public async Task CancelarAsync(int id)
     {
         await _citaDAO.CancelarAsync(id);
@@ -31,6 +36,11 @@ public class CitaService : ICitaService
     public async Task<List<CitaDto>> ListarPorVeterinarioAsync(int idVeterinario)
     {
         return await _citaDAO.ListarPorVeterinarioAsync(idVeterinario);
+    }
+
+    public async Task<List<CitaDto>> ListarCompletadasSinFacturaAsync()
+    {
+        return await _citaDAO.ListarCompletadasSinFacturaAsync();
     }
 }
 

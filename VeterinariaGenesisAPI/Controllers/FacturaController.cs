@@ -108,6 +108,50 @@ public class FacturaController : ControllerBase
             return StatusCode(500, new { message = "Error interno del servidor" });
         }
     }
+
+    /// <summary>
+    /// Obtiene una factura por su ID
+    /// </summary>
+    [HttpGet("{id}")]
+    [Authorize(Policy = "AllRoles")]
+    [ProducesResponseType(typeof(FacturaDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<FacturaDto>> BuscarPorID(int id)
+    {
+        try
+        {
+            var factura = await _facturaService.BuscarPorIDAsync(id);
+            if (factura == null)
+                return NotFound(new { message = "Factura no encontrada" });
+
+            return Ok(factura);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al buscar factura por ID: {Id}", id);
+            return StatusCode(500, new { message = "Error interno del servidor" });
+        }
+    }
+
+    /// <summary>
+    /// Lista todas las facturas
+    /// </summary>
+    [HttpGet]
+    [Authorize(Policy = "AllRoles")]
+    [ProducesResponseType(typeof(List<FacturaDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<FacturaDto>>> Listar()
+    {
+        try
+        {
+            var facturas = await _facturaService.ListarAsync();
+            return Ok(facturas);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al listar facturas");
+            return StatusCode(500, new { message = "Error interno del servidor" });
+        }
+    }
 }
 
 

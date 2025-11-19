@@ -25,4 +25,15 @@ public class CitaCreateDto
     public int ID_Servicio { get; set; }
 }
 
+public class CitaUpdateDto
+{
+    public int ID_Cita { get; set; }
+    public DateTime Fecha { get; set; }
+    public TimeSpan Hora { get; set; }
+    public int ID_Mascota { get; set; }
+    public int ID_Veterinario { get; set; }
+    public int ID_Servicio { get; set; }
+    public string Estado { get; set; } = string.Empty;
+}
+
 

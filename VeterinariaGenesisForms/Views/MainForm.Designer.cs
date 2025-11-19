@@ -9,7 +9,10 @@ partial class MainForm
     private ToolStripMenuItem mnuPropietarios = null!;
     private ToolStripMenuItem mnuMascotas = null!;
     private ToolStripMenuItem mnuCitas = null!;
+    private ToolStripMenuItem mnuAgendarCita = null!;
     private ToolStripMenuItem mnuFacturas = null!;
+    private ToolStripMenuItem mnuPagoFacturas = null!;
+    private ToolStripMenuItem mnuServicios = null!;
     private ToolStripMenuItem mnuReportes = null!;
     private ToolStripMenuItem mnuReportePropietarios = null!;
     private ToolStripMenuItem mnuReporteServiciosVendidos = null!;
@@ -20,6 +23,9 @@ partial class MainForm
     private ToolStripMenuItem mnuSalir = null!;
     private StatusStrip statusStrip1 = null!;
     private ToolStripStatusLabel lblUsuario = null!;
+    private Panel panelBienvenida = null!;
+    private Label lblTituloBienvenida = null!;
+    private Label lblMensajeBienvenida = null!;
 
     protected override void Dispose(bool disposing)
     {
@@ -37,7 +43,10 @@ partial class MainForm
         mnuPropietarios = new ToolStripMenuItem();
         mnuMascotas = new ToolStripMenuItem();
         mnuCitas = new ToolStripMenuItem();
+        mnuAgendarCita = new ToolStripMenuItem();
         mnuFacturas = new ToolStripMenuItem();
+        mnuPagoFacturas = new ToolStripMenuItem();
+        mnuServicios = new ToolStripMenuItem();
         mnuReportes = new ToolStripMenuItem();
         mnuReportePropietarios = new ToolStripMenuItem();
         mnuReporteServiciosVendidos = new ToolStripMenuItem();
@@ -48,14 +57,18 @@ partial class MainForm
         mnuSalir = new ToolStripMenuItem();
         statusStrip1 = new StatusStrip();
         lblUsuario = new ToolStripStatusLabel();
+        panelBienvenida = new Panel();
+        lblMensajeBienvenida = new Label();
+        lblTituloBienvenida = new Label();
         menuStrip1.SuspendLayout();
         statusStrip1.SuspendLayout();
+        panelBienvenida.SuspendLayout();
         SuspendLayout();
         // 
         // menuStrip1
         // 
         menuStrip1.ImageScalingSize = new Size(20, 20);
-        menuStrip1.Items.AddRange(new ToolStripItem[] { mnuGestion, mnuReportes, mnuUsuario });
+        menuStrip1.Items.AddRange(new ToolStripItem[] { mnuGestion, mnuServicios, mnuReportes, mnuUsuario });
         menuStrip1.Location = new Point(0, 0);
         menuStrip1.Name = "menuStrip1";
         menuStrip1.Padding = new Padding(7, 3, 0, 3);
@@ -65,38 +78,59 @@ partial class MainForm
         // 
         // mnuGestion
         // 
-        mnuGestion.DropDownItems.AddRange(new ToolStripItem[] { mnuPropietarios, mnuMascotas, mnuCitas, mnuFacturas });
+        mnuGestion.DropDownItems.AddRange(new ToolStripItem[] { mnuPropietarios, mnuMascotas, mnuCitas, mnuAgendarCita, mnuFacturas, mnuPagoFacturas });
         mnuGestion.Name = "mnuGestion";
-        mnuGestion.Size = new Size(75, 24);
+        mnuGestion.Size = new Size(73, 24);
         mnuGestion.Text = "&Gestión";
         // 
         // mnuPropietarios
         // 
         mnuPropietarios.Name = "mnuPropietarios";
-        mnuPropietarios.Size = new Size(180, 26);
+        mnuPropietarios.Size = new Size(224, 26);
         mnuPropietarios.Text = "&Propietarios";
         mnuPropietarios.Click += mnuPropietarios_Click;
         // 
         // mnuMascotas
         // 
         mnuMascotas.Name = "mnuMascotas";
-        mnuMascotas.Size = new Size(180, 26);
+        mnuMascotas.Size = new Size(224, 26);
         mnuMascotas.Text = "&Mascotas";
         mnuMascotas.Click += mnuMascotas_Click;
         // 
         // mnuCitas
         // 
         mnuCitas.Name = "mnuCitas";
-        mnuCitas.Size = new Size(180, 26);
-        mnuCitas.Text = "&Citas";
+        mnuCitas.Size = new Size(224, 26);
+        mnuCitas.Text = "&Ver Citas";
         mnuCitas.Click += mnuCitas_Click;
+        // 
+        // mnuAgendarCita
+        // 
+        mnuAgendarCita.Name = "mnuAgendarCita";
+        mnuAgendarCita.Size = new Size(224, 26);
+        mnuAgendarCita.Text = "&Agendar Cita";
+        mnuAgendarCita.Click += mnuAgendarCita_Click;
         // 
         // mnuFacturas
         // 
         mnuFacturas.Name = "mnuFacturas";
-        mnuFacturas.Size = new Size(180, 26);
-        mnuFacturas.Text = "&Facturas";
+        mnuFacturas.Size = new Size(224, 26);
+        mnuFacturas.Text = "&Gestión Facturas";
         mnuFacturas.Click += mnuFacturas_Click;
+        // 
+        // mnuPagoFacturas
+        // 
+        mnuPagoFacturas.Name = "mnuPagoFacturas";
+        mnuPagoFacturas.Size = new Size(224, 26);
+        mnuPagoFacturas.Text = "&Pago Facturas";
+        mnuPagoFacturas.Click += mnuPagoFacturas_Click;
+        // 
+        // mnuServicios
+        // 
+        mnuServicios.Name = "mnuServicios";
+        mnuServicios.Size = new Size(81, 24);
+        mnuServicios.Text = "&Servicios";
+        mnuServicios.Click += mnuServicios_Click;
         // 
         // mnuReportes
         // 
@@ -170,11 +204,45 @@ partial class MainForm
         lblUsuario.Name = "lblUsuario";
         lblUsuario.Size = new Size(0, 16);
         // 
+        // panelBienvenida
+        // 
+        panelBienvenida.BackColor = Color.White;
+        panelBienvenida.Controls.Add(lblMensajeBienvenida);
+        panelBienvenida.Controls.Add(lblTituloBienvenida);
+        panelBienvenida.Dock = DockStyle.Fill;
+        panelBienvenida.Location = new Point(0, 30);
+        panelBienvenida.Name = "panelBienvenida";
+        panelBienvenida.Padding = new Padding(40);
+        panelBienvenida.Size = new Size(1417, 735);
+        panelBienvenida.TabIndex = 2;
+        // 
+        // lblMensajeBienvenida
+        // 
+        lblMensajeBienvenida.AutoSize = true;
+        lblMensajeBienvenida.Font = new Font("Segoe UI", 14F);
+        lblMensajeBienvenida.ForeColor = Color.FromArgb(64, 64, 64);
+        lblMensajeBienvenida.Location = new Point(40, 130);
+        lblMensajeBienvenida.Name = "lblMensajeBienvenida";
+        lblMensajeBienvenida.Size = new Size(0, 32);
+        lblMensajeBienvenida.TabIndex = 1;
+        // 
+        // lblTituloBienvenida
+        // 
+        lblTituloBienvenida.AutoSize = true;
+        lblTituloBienvenida.Font = new Font("Segoe UI", 32F, FontStyle.Bold);
+        lblTituloBienvenida.ForeColor = Color.FromArgb(76, 175, 80);
+        lblTituloBienvenida.Location = new Point(219, 27);
+        lblTituloBienvenida.Name = "lblTituloBienvenida";
+        lblTituloBienvenida.Size = new Size(853, 72);
+        lblTituloBienvenida.TabIndex = 0;
+        lblTituloBienvenida.Text = "Bienvenido a Veterinaria Genesis";
+        // 
         // MainForm
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(1417, 787);
+        Controls.Add(panelBienvenida);
         Controls.Add(statusStrip1);
         Controls.Add(menuStrip1);
         IsMdiContainer = true;
@@ -189,6 +257,8 @@ partial class MainForm
         menuStrip1.PerformLayout();
         statusStrip1.ResumeLayout(false);
         statusStrip1.PerformLayout();
+        panelBienvenida.ResumeLayout(false);
+        panelBienvenida.PerformLayout();
         ResumeLayout(false);
         PerformLayout();
     }

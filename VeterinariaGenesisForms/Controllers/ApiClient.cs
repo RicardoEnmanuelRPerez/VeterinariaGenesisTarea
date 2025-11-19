@@ -38,13 +38,26 @@ public class ApiClient
         try
         {
             var response = await _httpClient.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Error al realizar la petición GET: Response status code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}). " +
+                    $"URL: {_httpClient.BaseAddress}{endpoint}. " +
+                    $"Response: {errorContent}");
+            }
+            
             var content = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(content);
         }
-        catch (HttpRequestException ex)
+        catch (HttpRequestException)
         {
-            throw new Exception($"Error al realizar la petición GET: {ex.Message}", ex);
+            throw; // Re-lanzar para mantener el mensaje detallado
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al realizar la petición GET a {endpoint}: {ex.Message}", ex);
         }
     }
 

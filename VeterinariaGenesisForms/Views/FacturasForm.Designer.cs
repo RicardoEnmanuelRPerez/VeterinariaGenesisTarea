@@ -8,6 +8,7 @@ partial class FacturasForm
     private Label lblCita = null!;
     private ComboBox cmbCita = null!;
     private Button btnCrearFactura = null!;
+    private Button btnRecargarCitas = null!;
     private GroupBox gbxAgregarItem = null!;
     private Label lblIDFactura = null!;
     private Label lblIDServicioItem = null!;
@@ -16,14 +17,17 @@ partial class FacturasForm
     private TextBox txtIDServicioItem = null!;
     private TextBox txtCantidad = null!;
     private Button btnAgregarItem = null!;
-    private GroupBox gbxPagar = null!;
-    private Label lblIDFacturaPago = null!;
-    private Label lblMonto = null!;
-    private Label lblMetodoPago = null!;
-    private TextBox txtIDFacturaPago = null!;
-    private TextBox txtMonto = null!;
-    private ComboBox cmbMetodoPago = null!;
-    private Button btnPagar = null!;
+    private GroupBox gbxDatosCita = null!;
+    private Label lblPropietario = null!;
+    private Label lblMascota = null!;
+    private Label lblVeterinario = null!;
+    private Label lblServicio = null!;
+    private Label lblFechaCita = null!;
+    private TextBox txtPropietario = null!;
+    private TextBox txtMascota = null!;
+    private TextBox txtVeterinario = null!;
+    private TextBox txtServicio = null!;
+    private TextBox txtFechaCita = null!;
     private Label lblEstado = null!;
     private GroupBox gbxHistorial = null!;
     private DataGridView dgvFacturas = null!;
@@ -49,6 +53,7 @@ partial class FacturasForm
         lblCita = new Label();
         cmbCita = new ComboBox();
         btnCrearFactura = new Button();
+        btnRecargarCitas = new Button();
         gbxAgregarItem = new GroupBox();
         btnAgregarItem = new Button();
         txtCantidad = new TextBox();
@@ -57,14 +62,17 @@ partial class FacturasForm
         lblCantidad = new Label();
         lblIDServicioItem = new Label();
         lblIDFactura = new Label();
-        gbxPagar = new GroupBox();
-        btnPagar = new Button();
-        cmbMetodoPago = new ComboBox();
-        txtMonto = new TextBox();
-        txtIDFacturaPago = new TextBox();
-        lblMetodoPago = new Label();
-        lblMonto = new Label();
-        lblIDFacturaPago = new Label();
+        gbxDatosCita = new GroupBox();
+        txtFechaCita = new TextBox();
+        txtServicio = new TextBox();
+        txtVeterinario = new TextBox();
+        txtMascota = new TextBox();
+        txtPropietario = new TextBox();
+        lblFechaCita = new Label();
+        lblServicio = new Label();
+        lblVeterinario = new Label();
+        lblMascota = new Label();
+        lblPropietario = new Label();
         lblEstado = new Label();
         gbxHistorial = new GroupBox();
         btnCargarFacturas = new Button();
@@ -76,7 +84,7 @@ partial class FacturasForm
         dgvDetalles = new DataGridView();
         gbxCrearFactura.SuspendLayout();
         gbxAgregarItem.SuspendLayout();
-        gbxPagar.SuspendLayout();
+        gbxDatosCita.SuspendLayout();
         gbxHistorial.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)dgvFacturas).BeginInit();
         gbxDetalles.SuspendLayout();
@@ -88,6 +96,7 @@ partial class FacturasForm
         gbxCrearFactura.Controls.Add(lblCita);
         gbxCrearFactura.Controls.Add(cmbCita);
         gbxCrearFactura.Controls.Add(btnCrearFactura);
+        gbxCrearFactura.Controls.Add(btnRecargarCitas);
         gbxCrearFactura.Font = new Font("Segoe UI", 10F);
         gbxCrearFactura.Location = new Point(14, 16);
         gbxCrearFactura.Margin = new Padding(3, 4, 3, 4);
@@ -128,6 +137,18 @@ partial class FacturasForm
         btnCrearFactura.Text = "&Crear Factura";
         btnCrearFactura.UseVisualStyleBackColor = true;
         btnCrearFactura.Click += btnCrearFactura_Click;
+        // 
+        // btnRecargarCitas
+        // 
+        btnRecargarCitas.Font = new Font("Segoe UI", 9F);
+        btnRecargarCitas.Location = new Point(920, 33);
+        btnRecargarCitas.Margin = new Padding(3, 4, 3, 4);
+        btnRecargarCitas.Name = "btnRecargarCitas";
+        btnRecargarCitas.Size = new Size(120, 40);
+        btnRecargarCitas.TabIndex = 3;
+        btnRecargarCitas.Text = "&Recargar Citas";
+        btnRecargarCitas.UseVisualStyleBackColor = true;
+        btnRecargarCitas.Click += btnRecargarCitas_Click;
         // 
         // gbxAgregarItem
         // 
@@ -211,100 +232,128 @@ partial class FacturasForm
         lblIDFactura.TabIndex = 0;
         lblIDFactura.Text = "ID Factura:";
         // 
-        // gbxPagar
+        // gbxDatosCita
         // 
-        gbxPagar.Controls.Add(btnPagar);
-        gbxPagar.Controls.Add(cmbMetodoPago);
-        gbxPagar.Controls.Add(txtMonto);
-        gbxPagar.Controls.Add(txtIDFacturaPago);
-        gbxPagar.Controls.Add(lblMetodoPago);
-        gbxPagar.Controls.Add(lblMonto);
-        gbxPagar.Controls.Add(lblIDFacturaPago);
-        gbxPagar.Font = new Font("Segoe UI", 10F);
-        gbxPagar.Location = new Point(720, 147);
-        gbxPagar.Margin = new Padding(3, 4, 3, 4);
-        gbxPagar.Name = "gbxPagar";
-        gbxPagar.Padding = new Padding(3, 4, 3, 4);
-        gbxPagar.Size = new Size(665, 160);
-        gbxPagar.TabIndex = 2;
-        gbxPagar.TabStop = false;
-        gbxPagar.Text = "Pagar Factura";
+        gbxDatosCita.Controls.Add(txtFechaCita);
+        gbxDatosCita.Controls.Add(txtServicio);
+        gbxDatosCita.Controls.Add(txtVeterinario);
+        gbxDatosCita.Controls.Add(txtMascota);
+        gbxDatosCita.Controls.Add(txtPropietario);
+        gbxDatosCita.Controls.Add(lblFechaCita);
+        gbxDatosCita.Controls.Add(lblServicio);
+        gbxDatosCita.Controls.Add(lblVeterinario);
+        gbxDatosCita.Controls.Add(lblMascota);
+        gbxDatosCita.Controls.Add(lblPropietario);
+        gbxDatosCita.Font = new Font("Segoe UI", 10F);
+        gbxDatosCita.Location = new Point(720, 147);
+        gbxDatosCita.Margin = new Padding(3, 4, 3, 4);
+        gbxDatosCita.Name = "gbxDatosCita";
+        gbxDatosCita.Padding = new Padding(3, 4, 3, 4);
+        gbxDatosCita.Size = new Size(665, 200);
+        gbxDatosCita.TabIndex = 2;
+        gbxDatosCita.TabStop = false;
+        gbxDatosCita.Text = "Datos de la Cita Seleccionada";
         // 
-        // btnPagar
+        // txtFechaCita
         // 
-        btnPagar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-        btnPagar.Location = new Point(400, 87);
-        btnPagar.Margin = new Padding(3, 4, 3, 4);
-        btnPagar.Name = "btnPagar";
-        btnPagar.Size = new Size(229, 40);
-        btnPagar.TabIndex = 6;
-        btnPagar.Text = "&Procesar Pago";
-        btnPagar.UseVisualStyleBackColor = true;
-        btnPagar.Click += btnPagar_Click;
+        txtFechaCita.Location = new Point(450, 107);
+        txtFechaCita.Margin = new Padding(3, 4, 3, 4);
+        txtFechaCita.Name = "txtFechaCita";
+        txtFechaCita.ReadOnly = true;
+        txtFechaCita.Size = new Size(190, 30);
+        txtFechaCita.TabIndex = 9;
         // 
-        // cmbMetodoPago
+        // txtServicio
         // 
-        cmbMetodoPago.DropDownStyle = ComboBoxStyle.DropDownList;
-        cmbMetodoPago.FormattingEnabled = true;
-        cmbMetodoPago.Items.AddRange(new object[] { "Efectivo", "Tarjeta", "Transferencia" });
-        cmbMetodoPago.Location = new Point(164, 90);
-        cmbMetodoPago.Margin = new Padding(3, 4, 3, 4);
-        cmbMetodoPago.Name = "cmbMetodoPago";
-        cmbMetodoPago.Size = new Size(228, 31);
-        cmbMetodoPago.TabIndex = 5;
+        txtServicio.Location = new Point(120, 107);
+        txtServicio.Margin = new Padding(3, 4, 3, 4);
+        txtServicio.Name = "txtServicio";
+        txtServicio.ReadOnly = true;
+        txtServicio.Size = new Size(250, 30);
+        txtServicio.TabIndex = 7;
         // 
-        // txtMonto
+        // txtVeterinario
         // 
-        txtMonto.Location = new Point(320, 36);
-        txtMonto.Margin = new Padding(3, 4, 3, 4);
-        txtMonto.Name = "txtMonto";
-        txtMonto.Size = new Size(137, 30);
-        txtMonto.TabIndex = 3;
+        txtVeterinario.Location = new Point(490, 67);
+        txtVeterinario.Margin = new Padding(3, 4, 3, 4);
+        txtVeterinario.Name = "txtVeterinario";
+        txtVeterinario.ReadOnly = true;
+        txtVeterinario.Size = new Size(150, 30);
+        txtVeterinario.TabIndex = 5;
         // 
-        // txtIDFacturaPago
+        // txtMascota
         // 
-        txtIDFacturaPago.Location = new Point(114, 36);
-        txtIDFacturaPago.Margin = new Padding(3, 4, 3, 4);
-        txtIDFacturaPago.Name = "txtIDFacturaPago";
-        txtIDFacturaPago.Size = new Size(114, 30);
-        txtIDFacturaPago.TabIndex = 1;
+        txtMascota.Location = new Point(120, 67);
+        txtMascota.Margin = new Padding(3, 4, 3, 4);
+        txtMascota.Name = "txtMascota";
+        txtMascota.ReadOnly = true;
+        txtMascota.Size = new Size(250, 30);
+        txtMascota.TabIndex = 3;
         // 
-        // lblMetodoPago
+        // txtPropietario
         // 
-        lblMetodoPago.AutoSize = true;
-        lblMetodoPago.Location = new Point(17, 93);
-        lblMetodoPago.Name = "lblMetodoPago";
-        lblMetodoPago.Size = new Size(141, 23);
-        lblMetodoPago.TabIndex = 4;
-        lblMetodoPago.Text = "Método de Pago:";
+        txtPropietario.Location = new Point(120, 27);
+        txtPropietario.Margin = new Padding(3, 4, 3, 4);
+        txtPropietario.Name = "txtPropietario";
+        txtPropietario.ReadOnly = true;
+        txtPropietario.Size = new Size(520, 30);
+        txtPropietario.TabIndex = 1;
         // 
-        // lblMonto
+        // lblFechaCita
         // 
-        lblMonto.AutoSize = true;
-        lblMonto.Location = new Point(251, 40);
-        lblMonto.Name = "lblMonto";
-        lblMonto.Size = new Size(65, 23);
-        lblMonto.TabIndex = 2;
-        lblMonto.Text = "Monto:";
+        lblFechaCita.AutoSize = true;
+        lblFechaCita.Location = new Point(390, 110);
+        lblFechaCita.Name = "lblFechaCita";
+        lblFechaCita.Size = new Size(58, 23);
+        lblFechaCita.TabIndex = 8;
+        lblFechaCita.Text = "Fecha:";
         // 
-        // lblIDFacturaPago
+        // lblServicio
         // 
-        lblIDFacturaPago.AutoSize = true;
-        lblIDFacturaPago.Location = new Point(17, 40);
-        lblIDFacturaPago.Name = "lblIDFacturaPago";
-        lblIDFacturaPago.Size = new Size(91, 23);
-        lblIDFacturaPago.TabIndex = 0;
-        lblIDFacturaPago.Text = "ID Factura:";
+        lblServicio.AutoSize = true;
+        lblServicio.Location = new Point(17, 110);
+        lblServicio.Name = "lblServicio";
+        lblServicio.Size = new Size(72, 23);
+        lblServicio.TabIndex = 6;
+        lblServicio.Text = "Servicio:";
+        // 
+        // lblVeterinario
+        // 
+        lblVeterinario.AutoSize = true;
+        lblVeterinario.Location = new Point(390, 70);
+        lblVeterinario.Name = "lblVeterinario";
+        lblVeterinario.Size = new Size(97, 23);
+        lblVeterinario.TabIndex = 4;
+        lblVeterinario.Text = "Veterinario:";
+        // 
+        // lblMascota
+        // 
+        lblMascota.AutoSize = true;
+        lblMascota.Location = new Point(17, 70);
+        lblMascota.Name = "lblMascota";
+        lblMascota.Size = new Size(78, 23);
+        lblMascota.TabIndex = 2;
+        lblMascota.Text = "Mascota:";
+        // 
+        // lblPropietario
+        // 
+        lblPropietario.AutoSize = true;
+        lblPropietario.Location = new Point(17, 30);
+        lblPropietario.Name = "lblPropietario";
+        lblPropietario.Size = new Size(98, 23);
+        lblPropietario.TabIndex = 0;
+        lblPropietario.Text = "Propietario:";
         // 
         // lblEstado
         // 
         lblEstado.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
         lblEstado.AutoSize = true;
-        lblEstado.Font = new Font("Segoe UI", 9F);
-        lblEstado.Location = new Point(14, 333);
+        lblEstado.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+        lblEstado.Location = new Point(14, 810);
         lblEstado.Name = "lblEstado";
-        lblEstado.Size = new Size(0, 20);
+        lblEstado.Size = new Size(200, 20);
         lblEstado.TabIndex = 3;
+        lblEstado.Text = "Estado: Cargando...";
         // 
         // gbxHistorial
         // 
@@ -417,7 +466,7 @@ partial class FacturasForm
         Controls.Add(gbxDetalles);
         Controls.Add(gbxHistorial);
         Controls.Add(lblEstado);
-        Controls.Add(gbxPagar);
+        Controls.Add(gbxDatosCita);
         Controls.Add(gbxAgregarItem);
         Controls.Add(gbxCrearFactura);
         Font = new Font("Segoe UI", 9F);
@@ -431,8 +480,8 @@ partial class FacturasForm
         gbxCrearFactura.PerformLayout();
         gbxAgregarItem.ResumeLayout(false);
         gbxAgregarItem.PerformLayout();
-        gbxPagar.ResumeLayout(false);
-        gbxPagar.PerformLayout();
+        gbxDatosCita.ResumeLayout(false);
+        gbxDatosCita.PerformLayout();
         gbxHistorial.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)dgvFacturas).EndInit();
         gbxDetalles.ResumeLayout(false);

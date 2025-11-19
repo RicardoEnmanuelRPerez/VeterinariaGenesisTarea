@@ -1,4 +1,7 @@
 #nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ClosedXML.Excel;
 using VeterinariaGenesisForms.Models.Dto;
 using VeterinariaGenesisForms.Repository;
@@ -26,10 +29,14 @@ public partial class FacturasForm : Form
     private async void FacturasForm_Load(object? sender, EventArgs e)
     {
         AplicarColoresVeterinaria();
-        await CargarCitasAsync();
-        ConfigurarComboBoxes();
         ConfigurarDataGridViews();
         txtCantidad.Text = "1"; // Valor por defecto
+        LimpiarDatosCita();
+        
+        // Suscribir evento una sola vez
+        cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
+        
+        await CargarCitasAsync();
     }
 
     private void AplicarColoresVeterinaria()
@@ -39,8 +46,8 @@ public partial class FacturasForm : Form
         
         // GroupBoxes con colores suaves
         gbxCrearFactura.BackColor = Color.FromArgb(255, 255, 255); // Blanco
+        gbxDatosCita.BackColor = Color.FromArgb(255, 255, 255); // Blanco
         gbxAgregarItem.BackColor = Color.FromArgb(255, 255, 255); // Blanco
-        gbxPagar.BackColor = Color.FromArgb(255, 255, 255); // Blanco
         gbxHistorial.BackColor = Color.FromArgb(255, 255, 255); // Blanco
         gbxDetalles.BackColor = Color.FromArgb(255, 255, 255); // Blanco
         
@@ -55,15 +62,15 @@ public partial class FacturasForm : Form
         btnAgregarItem.FlatStyle = FlatStyle.Flat;
         btnAgregarItem.FlatAppearance.BorderSize = 0;
         
-        btnPagar.BackColor = Color.FromArgb(156, 39, 176); // Morado suave
-        btnPagar.ForeColor = Color.White;
-        btnPagar.FlatStyle = FlatStyle.Flat;
-        btnPagar.FlatAppearance.BorderSize = 0;
-        
         btnCargarFacturas.BackColor = Color.FromArgb(255, 152, 0); // Naranja suave
         btnCargarFacturas.ForeColor = Color.White;
         btnCargarFacturas.FlatStyle = FlatStyle.Flat;
         btnCargarFacturas.FlatAppearance.BorderSize = 0;
+        
+        btnRecargarCitas.BackColor = Color.FromArgb(156, 39, 176); // Morado
+        btnRecargarCitas.ForeColor = Color.White;
+        btnRecargarCitas.FlatStyle = FlatStyle.Flat;
+        btnRecargarCitas.FlatAppearance.BorderSize = 0;
         
         // DataGridViews con colores alternados suaves
         dgvFacturas.BackgroundColor = Color.FromArgb(250, 250, 250);
@@ -85,11 +92,6 @@ public partial class FacturasForm : Form
         lblSubtotal.ForeColor = Color.FromArgb(33, 150, 243); // Azul
     }
 
-    private void ConfigurarComboBoxes()
-    {
-        cmbMetodoPago.Items.Clear();
-        cmbMetodoPago.Items.AddRange(new object[] { "Efectivo", "Tarjeta de Crédito", "Tarjeta de Débito", "Transferencia Bancaria", "Cheque" });
-    }
 
     private void ConfigurarDataGridViews()
     {
@@ -109,19 +111,179 @@ public partial class FacturasForm : Form
     {
         try
         {
-            _citas = await _citaRepository.ListarPorFechaAsync(DateTime.Today);
-            cmbCita.DataSource = _citas.Where(c => c.Estado == "Completada").Select(c => new { 
+            lblEstado.Text = "Cargando citas completadas sin factura...";
+            lblEstado.ForeColor = Color.Blue;
+            Application.DoEvents(); // Permitir que la UI se actualice
+            
+            // Usar el nuevo método que solo trae citas completadas sin factura
+            var citasCompletadas = await _citaRepository.ListarCompletadasSinFacturaAsync();
+            
+            _citas = citasCompletadas;
+            
+            System.Diagnostics.Debug.WriteLine($"Citas completadas sin factura encontradas: {citasCompletadas.Count}");
+            
+            // Desconectar evento antes de modificar
+            cmbCita.SelectedIndexChanged -= CmbCita_SelectedIndexChanged;
+            
+            if (citasCompletadas.Count == 0)
+            {
+                cmbCita.DataSource = null;
+                cmbCita.Items.Clear();
+                
+                // Mostrar información útil
+                var mensaje = "No hay citas completadas disponibles para generar factura.\n\n";
+                mensaje += "Todas las citas completadas ya tienen factura asociada o no hay citas completadas.";
+                
+                lblEstado.Text = mensaje;
+                lblEstado.ForeColor = Color.Orange;
+                
+                // Reconectar evento
+                cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
+                return;
+            }
+            
+            // Crear lista de objetos anónimos para el ComboBox
+            var itemsCombo = citasCompletadas.Select(c => new { 
                 ID = c.ID_Cita, 
-                Descripcion = $"{c.Mascota} - {c.Fecha:dd/MM/yyyy} {c.Hora:hh\\:mm}" 
+                Descripcion = $"{c.Mascota ?? "N/A"} - {c.Fecha:dd/MM/yyyy} {c.Hora:hh\\:mm} - {c.Propietario ?? "N/A"}" 
             }).ToList();
+            
+            // Configurar el ComboBox
+            cmbCita.DataSource = null; // Limpiar primero
+            cmbCita.Items.Clear();
+            cmbCita.DataSource = itemsCombo;
             cmbCita.DisplayMember = "Descripcion";
             cmbCita.ValueMember = "ID";
             cmbCita.SelectedIndex = -1;
+            
+            // Reconectar evento DESPUÉS de configurar todo
+            cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
+            
+            lblEstado.Text = $"✓ Cargadas {citasCompletadas.Count} cita(s) completada(s) sin factura";
+            lblEstado.ForeColor = Color.Green;
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error al cargar citas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            var mensajeError = $"Error al cargar citas: {ex.Message}";
+            if (ex.InnerException != null)
+            {
+                mensajeError += $"\n\nDetalle: {ex.InnerException.Message}";
+            }
+            
+            MessageBox.Show(mensajeError, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            lblEstado.Text = $"Error: {ex.Message}";
+            lblEstado.ForeColor = Color.Red;
+            
+            // Asegurar que el ComboBox esté limpio
+            cmbCita.SelectedIndexChanged -= CmbCita_SelectedIndexChanged;
+            cmbCita.DataSource = null;
+            cmbCita.Items.Clear();
+            cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
         }
+    }
+
+    private void CmbCita_SelectedIndexChanged(object? sender, EventArgs e)
+    {
+        // Verificar que hay una selección válida
+        if (cmbCita.SelectedIndex < 0 || cmbCita.SelectedItem == null)
+        {
+            LimpiarDatosCita();
+            return;
+        }
+
+        try
+        {
+            // Obtener el ID de la cita seleccionada
+            int citaIdInt = -1;
+            
+            // Intentar obtener el valor usando SelectedValue (método preferido)
+            if (cmbCita.SelectedValue != null)
+            {
+                if (int.TryParse(cmbCita.SelectedValue.ToString(), out citaIdInt))
+                {
+                    // Valor obtenido correctamente
+                }
+                else if (cmbCita.SelectedValue is int idDirecto)
+                {
+                    citaIdInt = idDirecto;
+                }
+            }
+            
+            // Si no funcionó SelectedValue, intentar con reflexión
+            if (citaIdInt == -1 && cmbCita.SelectedItem != null)
+            {
+                var tipo = cmbCita.SelectedItem.GetType();
+                var propId = tipo.GetProperty("ID");
+                if (propId != null)
+                {
+                    var valor = propId.GetValue(cmbCita.SelectedItem);
+                    if (valor != null && int.TryParse(valor.ToString(), out var id))
+                    {
+                        citaIdInt = id;
+                    }
+                }
+            }
+            
+            // Si aún no tenemos el ID, salir
+            if (citaIdInt == -1)
+            {
+                LimpiarDatosCita();
+                lblEstado.Text = "No se pudo obtener el ID de la cita seleccionada";
+                lblEstado.ForeColor = Color.Red;
+                return;
+            }
+            
+            // Buscar la cita en la lista
+            var cita = _citas.FirstOrDefault(c => c.ID_Cita == citaIdInt);
+            if (cita != null)
+            {
+                // Auto-rellenar datos del propietario y mascota
+                txtPropietario.Text = cita.Propietario ?? "N/A";
+                txtMascota.Text = cita.Mascota ?? "N/A";
+                txtVeterinario.Text = cita.Veterinario ?? "N/A";
+                txtServicio.Text = cita.Servicio ?? "N/A";
+                txtFechaCita.Text = $"{cita.Fecha:dd/MM/yyyy} {cita.Hora:hh\\:mm}";
+                
+                lblEstado.Text = $"Cita seleccionada: {cita.Mascota ?? "N/A"} - ID: {cita.ID_Cita}";
+                lblEstado.ForeColor = Color.Green;
+            }
+            else
+            {
+                LimpiarDatosCita();
+                lblEstado.Text = $"No se encontraron los datos de la cita ID: {citaIdInt}";
+                lblEstado.ForeColor = Color.Orange;
+            }
+        }
+        catch (Exception ex)
+        {
+            LimpiarDatosCita();
+            lblEstado.Text = $"Error al cargar datos: {ex.Message}";
+            lblEstado.ForeColor = Color.Red;
+            MessageBox.Show($"Error al cargar datos de la cita: {ex.Message}\n\nDetalles: {ex}", 
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private async void btnRecargarCitas_Click(object? sender, EventArgs e)
+    {
+        btnRecargarCitas.Enabled = false;
+        try
+        {
+            await CargarCitasAsync();
+        }
+        finally
+        {
+            btnRecargarCitas.Enabled = true;
+        }
+    }
+
+    private void LimpiarDatosCita()
+    {
+        txtPropietario.Clear();
+        txtMascota.Clear();
+        txtVeterinario.Clear();
+        txtServicio.Clear();
+        txtFechaCita.Clear();
     }
 
     private async void btnCrearFactura_Click(object? sender, EventArgs e)
@@ -140,13 +302,20 @@ public partial class FacturasForm : Form
                 MessageBox.Show("Debe seleccionar una cita completada.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            var citaId = citaItem.GetType().GetProperty("ID")?.GetValue(citaItem);
-            if (citaId == null || !(citaId is int citaIdInt))
+            
+            var prop = citaItem.GetType().GetProperty("ID");
+            if (prop == null)
             {
                 MessageBox.Show("Error al obtener el ID de la cita.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            var idCita = citaIdInt;
+            
+            var citaIdValue = prop.GetValue(citaItem);
+            if (citaIdValue == null || !int.TryParse(citaIdValue.ToString(), out var idCita))
+            {
+                MessageBox.Show("Error al obtener el ID de la cita.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             var dto = new FacturaCreateDto { ID_Cita = idCita };
 
@@ -163,8 +332,10 @@ public partial class FacturasForm : Form
             
             // Preparar para agregar items
             txtIDFactura.Text = idFactura.ToString();
-            txtIDFacturaPago.Text = idFactura.ToString();
             CalcularTotal();
+            
+            // Recargar historial de facturas
+            btnCargarFacturas_Click(sender, e);
         }
         catch (Exception ex)
         {
@@ -230,72 +401,15 @@ public partial class FacturasForm : Form
         }
     }
 
-    private async void btnPagar_Click(object? sender, EventArgs e)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(txtIDFacturaPago.Text) || !int.TryParse(txtIDFacturaPago.Text, out var idFactura))
-            {
-                MessageBox.Show("Debe ingresar un ID de factura válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
 
-            if (string.IsNullOrWhiteSpace(txtMonto.Text) || !decimal.TryParse(txtMonto.Text, out var monto) || monto <= 0)
-            {
-                MessageBox.Show("Debe ingresar un monto válido mayor a cero.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (cmbMetodoPago.SelectedItem == null)
-            {
-                MessageBox.Show("Debe seleccionar un método de pago.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            var dto = new FacturaPagoDto
-            {
-                ID_Factura = idFactura,
-                MontoPagado = monto,
-                MetodoPago = cmbMetodoPago.Text
-            };
-
-            btnPagar.Enabled = false;
-            lblEstado.Text = "Procesando pago...";
-            lblEstado.ForeColor = Color.Blue;
-
-            await _facturaRepository.PagarAsync(dto);
-            MessageBox.Show($"Pago de ${monto:F2} procesado exitosamente mediante {dto.MetodoPago}.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            
-            // Recargar la factura para actualizar estado
-            await CargarFacturaAsync(idFactura);
-            LimpiarFormularioPago();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error al procesar pago: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-        finally
-        {
-            btnPagar.Enabled = true;
-        }
-    }
-
-    private void LimpiarFormularioPago()
-    {
-        txtMonto.Clear();
-        cmbMetodoPago.SelectedIndex = -1;
-        // No limpiar txtIDFacturaPago para mantener la factura seleccionada
-    }
 
     private async Task CargarFacturaAsync(int idFactura)
     {
         try
         {
-            // Por ahora, solo actualizamos la factura seleccionada si ya la tenemos
-            // En el futuro, podríamos agregar un endpoint para obtener factura por ID
-            if (_facturaSeleccionada != null && _facturaSeleccionada.ID_Factura == idFactura)
+            _facturaSeleccionada = await _facturaRepository.BuscarPorIDAsync(idFactura);
+            if (_facturaSeleccionada != null)
             {
-                // Recargar detalles si es posible
                 ActualizarVistaFactura();
             }
         }
@@ -305,16 +419,21 @@ public partial class FacturasForm : Form
         }
     }
 
-    private void DgvFacturas_SelectionChanged(object? sender, EventArgs e)
+    private async void DgvFacturas_SelectionChanged(object? sender, EventArgs e)
     {
         if (dgvFacturas.SelectedRows.Count > 0 && dgvFacturas.SelectedRows[0] != null)
         {
             var cell = dgvFacturas.SelectedRows[0].Cells["ID_Factura"];
-            if (cell?.Value != null && cell.Value is int id)
+            if (cell?.Value != null && int.TryParse(cell.Value.ToString(), out var id))
             {
-                _facturaSeleccionada = _facturas.FirstOrDefault(f => f.ID_Factura == id);
-                ActualizarVistaFactura();
+                // Recargar la factura desde la base de datos para obtener el estado actualizado
+                await CargarFacturaAsync(id);
             }
+        }
+        else
+        {
+            _facturaSeleccionada = null;
+            ActualizarVistaFactura();
         }
     }
 
@@ -330,33 +449,25 @@ public partial class FacturasForm : Form
         }
 
         // Mostrar detalles
-        dgvDetalles.DataSource = _facturaSeleccionada.Detalles;
+        dgvDetalles.DataSource = _facturaSeleccionada.Detalles ?? new List<FacturaDetalleDto>();
 
         // Calcular totales
-        _subtotal = _facturaSeleccionada.Detalles.Sum(d => d.Subtotal);
+        _subtotal = (_facturaSeleccionada.Detalles ?? new List<FacturaDetalleDto>()).Sum(d => d.Subtotal);
         _total = _facturaSeleccionada.Total;
 
         lblSubtotal.Text = $"Subtotal: ${_subtotal:F2}";
         lblTotal.Text = $"Total: ${_total:F2}";
         lblEstadoFactura.Text = $"Estado: {_facturaSeleccionada.EstadoPago}";
-
-        // Actualizar campos de pago
-        txtIDFacturaPago.Text = _facturaSeleccionada.ID_Factura.ToString();
-        txtMonto.Text = _total.ToString("F2");
-        
-        // Si ya está pagada, deshabilitar pago
-        btnPagar.Enabled = _facturaSeleccionada.EstadoPago != "Pagada";
     }
 
     private void CalcularTotal()
     {
         if (_facturaSeleccionada != null)
         {
-            _subtotal = _facturaSeleccionada.Detalles.Sum(d => d.Subtotal);
+            _subtotal = (_facturaSeleccionada.Detalles ?? new List<FacturaDetalleDto>()).Sum(d => d.Subtotal);
             _total = _facturaSeleccionada.Total;
             lblSubtotal.Text = $"Subtotal: ${_subtotal:F2}";
             lblTotal.Text = $"Total: ${_total:F2}";
-            txtMonto.Text = _total.ToString("F2");
         }
     }
 
@@ -368,9 +479,46 @@ public partial class FacturasForm : Form
 
     private async void btnCargarFacturas_Click(object? sender, EventArgs e)
     {
-        // Por ahora, este método se puede usar para recargar facturas
-        // En el futuro, cuando tengamos un endpoint para listar facturas, lo implementaremos aquí
-        MessageBox.Show("Funcionalidad de historial de facturas próximamente disponible.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        await RecargarListaFacturasAsync();
+    }
+
+    private async Task RecargarListaFacturasAsync()
+    {
+        try
+        {
+            btnCargarFacturas.Enabled = false;
+            lblEstado.Text = "Cargando facturas...";
+            lblEstado.ForeColor = Color.Blue;
+            Application.DoEvents(); // Permitir que la UI se actualice
+
+            // Limpiar la lista anterior para forzar recarga
+            _facturas.Clear();
+            dgvFacturas.DataSource = null;
+
+            // Recargar desde la base de datos
+            _facturas = await _facturaRepository.ListarAsync();
+            dgvFacturas.DataSource = _facturas;
+
+            // Si había una factura seleccionada, recargarla también
+            if (_facturaSeleccionada != null)
+            {
+                var idFactura = _facturaSeleccionada.ID_Factura;
+                await CargarFacturaAsync(idFactura);
+            }
+
+            lblEstado.Text = $"Se cargaron {_facturas.Count} factura(s)";
+            lblEstado.ForeColor = Color.Green;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error al cargar facturas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            lblEstado.Text = "Error al cargar facturas";
+            lblEstado.ForeColor = Color.Red;
+        }
+        finally
+        {
+            btnCargarFacturas.Enabled = true;
+        }
     }
 }
 

@@ -40,9 +40,20 @@ public class CitaRepository : ICitaRepository
         throw new Exception("No se pudo agendar la cita");
     }
 
+    public async Task ActualizarAsync(CitaUpdateDto dto)
+    {
+        await _apiClient.PutAsync("Cita", dto);
+    }
+
     public async Task CancelarAsync(int id)
     {
         await _apiClient.PostAsync($"Cita/{id}/cancelar", new { });
+    }
+
+    public async Task<List<CitaDto>> ListarCompletadasSinFacturaAsync()
+    {
+        var resultado = await _apiClient.GetAsync<List<CitaDto>>("Cita/completadas-sin-factura");
+        return resultado ?? new List<CitaDto>();
     }
 }
 

@@ -27,6 +27,16 @@ public class FacturaService : IFacturaService
     {
         await _facturaDAO.PagarAsync(dto);
     }
+
+    public async Task<FacturaDto?> BuscarPorIDAsync(int id)
+    {
+        return await _facturaDAO.BuscarPorIDAsync(id);
+    }
+
+    public async Task<List<FacturaDto>> ListarAsync()
+    {
+        return await _facturaDAO.ListarAsync();
+    }
 }
 
 

@@ -53,6 +53,38 @@ public class CitaController : ControllerBase
     }
 
     /// <summary>
+    /// Actualiza una cita existente
+    /// </summary>
+    [HttpPut]
+    [Authorize(Policy = "AdministradorOrVeterinario")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Actualizar([FromBody] CitaUpdateDto dto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            await _citaService.ActualizarAsync(dto);
+            return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Error de negocio al actualizar cita");
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al actualizar cita: {Id}", dto.ID_Cita);
+            return StatusCode(500, new { message = "Error interno del servidor" });
+        }
+    }
+
+    /// <summary>
     /// Cancela una cita programada
     /// </summary>
     [HttpPost("{id}/cancelar")]
@@ -136,6 +168,26 @@ public class CitaController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error al listar citas del veterinario: {Id}", idVeterinario);
+            return StatusCode(500, new { message = "Error interno del servidor" });
+        }
+    }
+
+    /// <summary>
+    /// Lista las citas completadas que no tienen factura asociada
+    /// </summary>
+    [HttpGet("completadas-sin-factura")]
+    [Authorize(Policy = "AllRoles")]
+    [ProducesResponseType(typeof(List<CitaDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<CitaDto>>> ListarCompletadasSinFactura()
+    {
+        try
+        {
+            var citas = await _citaService.ListarCompletadasSinFacturaAsync();
+            return Ok(citas);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error al listar citas completadas sin factura");
             return StatusCode(500, new { message = "Error interno del servidor" });
         }
     }

@@ -8,24 +8,28 @@ partial class CitasForm
     private Label lblFechaBuscar = null!;
     private DateTimePicker dtpFechaBuscar = null!;
     private Button btnBuscarPorFecha = null!;
-    private GroupBox gbxAgendar = null!;
+    private GroupBox gbxEditar = null!;
     private Label lblPropietario = null!;
     private Label lblMascota = null!;
-    private Label lblFechaAgendar = null!;
-    private Label lblHoraAgendar = null!;
-    private Label lblIDVeterinario = null!;
-    private Label lblIDServicio = null!;
+    private Label lblFechaEditar = null!;
+    private Label lblHoraEditar = null!;
+    private Label lblVeterinario = null!;
+    private Label lblServicios = null!;
+    private Label lblEstado = null!;
     private ComboBox cmbPropietario = null!;
     private ComboBox cmbMascota = null!;
-    private DateTimePicker dtpFechaAgendar = null!;
-    private DateTimePicker dtpHoraAgendar = null!;
-    private TextBox txtIDVeterinario = null!;
-    private TextBox txtIDServicio = null!;
-    private Button btnAgendar = null!;
+    private ComboBox cmbVeterinario = null!;
+    private CheckedListBox clbServicios = null!;
+    private DateTimePicker dtpFechaEditar = null!;
+    private DateTimePicker dtpHoraEditar = null!;
+    private ComboBox cmbEstado = null!;
+    private Button btnEditar = null!;
+    private Button btnActualizar = null!;
+    private Button btnLimpiar = null!;
     private DataGridView dgvCitas = null!;
     private Button btnCancelar = null!;
     private Button btnExportarExcel = null!;
-    private Label lblEstado = null!;
+    private Label lblEstadoMensaje = null!;
 
     protected override void Dispose(bool disposing)
     {
@@ -42,26 +46,30 @@ partial class CitasForm
         this.lblFechaBuscar = new Label();
         this.dtpFechaBuscar = new DateTimePicker();
         this.btnBuscarPorFecha = new Button();
-        this.gbxAgendar = new GroupBox();
+        this.gbxEditar = new GroupBox();
         this.lblPropietario = new Label();
         this.lblMascota = new Label();
-        this.lblFechaAgendar = new Label();
-        this.lblHoraAgendar = new Label();
-        this.lblIDVeterinario = new Label();
-        this.lblIDServicio = new Label();
+        this.lblFechaEditar = new Label();
+        this.lblHoraEditar = new Label();
+        this.lblVeterinario = new Label();
+        this.lblServicios = new Label();
+        this.lblEstado = new Label();
         this.cmbPropietario = new ComboBox();
         this.cmbMascota = new ComboBox();
-        this.dtpFechaAgendar = new DateTimePicker();
-        this.dtpHoraAgendar = new DateTimePicker();
-        this.txtIDVeterinario = new TextBox();
-        this.txtIDServicio = new TextBox();
-        this.btnAgendar = new Button();
+        this.cmbVeterinario = new ComboBox();
+        this.clbServicios = new CheckedListBox();
+        this.dtpFechaEditar = new DateTimePicker();
+        this.dtpHoraEditar = new DateTimePicker();
+        this.cmbEstado = new ComboBox();
+        this.btnEditar = new Button();
+        this.btnActualizar = new Button();
+        this.btnLimpiar = new Button();
         this.dgvCitas = new DataGridView();
         this.btnCancelar = new Button();
         this.btnExportarExcel = new Button();
-        this.lblEstado = new Label();
+        this.lblEstadoMensaje = new Label();
         this.gbxBuscar.SuspendLayout();
-        this.gbxAgendar.SuspendLayout();
+        this.gbxEditar.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)(this.dgvCitas)).BeginInit();
         this.SuspendLayout();
 
@@ -99,27 +107,31 @@ partial class CitasForm
         this.btnBuscarPorFecha.UseVisualStyleBackColor = true;
         this.btnBuscarPorFecha.Click += new EventHandler(this.btnBuscarPorFecha_Click);
 
-        // gbxAgendar
-        this.gbxAgendar.Controls.Add(this.btnAgendar);
-        this.gbxAgendar.Controls.Add(this.txtIDServicio);
-        this.gbxAgendar.Controls.Add(this.txtIDVeterinario);
-        this.gbxAgendar.Controls.Add(this.dtpHoraAgendar);
-        this.gbxAgendar.Controls.Add(this.dtpFechaAgendar);
-        this.gbxAgendar.Controls.Add(this.cmbMascota);
-        this.gbxAgendar.Controls.Add(this.cmbPropietario);
-        this.gbxAgendar.Controls.Add(this.lblIDServicio);
-        this.gbxAgendar.Controls.Add(this.lblIDVeterinario);
-        this.gbxAgendar.Controls.Add(this.lblHoraAgendar);
-        this.gbxAgendar.Controls.Add(this.lblFechaAgendar);
-        this.gbxAgendar.Controls.Add(this.lblMascota);
-        this.gbxAgendar.Controls.Add(this.lblPropietario);
-        this.gbxAgendar.Font = new Font("Segoe UI", 10F);
-        this.gbxAgendar.Location = new Point(630, 12);
-        this.gbxAgendar.Name = "gbxAgendar";
-        this.gbxAgendar.Size = new Size(582, 200);
-        this.gbxAgendar.TabIndex = 1;
-        this.gbxAgendar.TabStop = false;
-        this.gbxAgendar.Text = "Agendar Nueva Cita";
+        // gbxEditar
+        this.gbxEditar.Controls.Add(this.btnLimpiar);
+        this.gbxEditar.Controls.Add(this.btnActualizar);
+        this.gbxEditar.Controls.Add(this.btnEditar);
+        this.gbxEditar.Controls.Add(this.cmbEstado);
+        this.gbxEditar.Controls.Add(this.clbServicios);
+        this.gbxEditar.Controls.Add(this.cmbVeterinario);
+        this.gbxEditar.Controls.Add(this.dtpHoraEditar);
+        this.gbxEditar.Controls.Add(this.dtpFechaEditar);
+        this.gbxEditar.Controls.Add(this.cmbMascota);
+        this.gbxEditar.Controls.Add(this.cmbPropietario);
+        this.gbxEditar.Controls.Add(this.lblEstado);
+        this.gbxEditar.Controls.Add(this.lblServicios);
+        this.gbxEditar.Controls.Add(this.lblVeterinario);
+        this.gbxEditar.Controls.Add(this.lblHoraEditar);
+        this.gbxEditar.Controls.Add(this.lblFechaEditar);
+        this.gbxEditar.Controls.Add(this.lblMascota);
+        this.gbxEditar.Controls.Add(this.lblPropietario);
+        this.gbxEditar.Font = new Font("Segoe UI", 10F);
+        this.gbxEditar.Location = new Point(630, 12);
+        this.gbxEditar.Name = "gbxEditar";
+        this.gbxEditar.Size = new Size(582, 350);
+        this.gbxEditar.TabIndex = 1;
+        this.gbxEditar.TabStop = false;
+        this.gbxEditar.Text = "Editar Cita";
 
         this.lblPropietario.AutoSize = true;
         this.lblPropietario.Location = new Point(15, 30);
@@ -134,6 +146,8 @@ partial class CitasForm
         this.cmbPropietario.Name = "cmbPropietario";
         this.cmbPropietario.Size = new Size(200, 25);
         this.cmbPropietario.TabIndex = 1;
+        this.cmbPropietario.Enabled = false;
+        this.cmbPropietario.SelectedIndexChanged += new EventHandler(this.CmbPropietario_SelectedIndexChanged);
 
         this.lblMascota.AutoSize = true;
         this.lblMascota.Location = new Point(320, 30);
@@ -148,66 +162,111 @@ partial class CitasForm
         this.cmbMascota.Name = "cmbMascota";
         this.cmbMascota.Size = new Size(180, 25);
         this.cmbMascota.TabIndex = 3;
+        this.cmbMascota.Enabled = false;
 
-        this.lblFechaAgendar.AutoSize = true;
-        this.lblFechaAgendar.Location = new Point(15, 70);
-        this.lblFechaAgendar.Name = "lblFechaAgendar";
-        this.lblFechaAgendar.Size = new Size(48, 19);
-        this.lblFechaAgendar.TabIndex = 4;
-        this.lblFechaAgendar.Text = "Fecha:";
+        this.lblFechaEditar.AutoSize = true;
+        this.lblFechaEditar.Location = new Point(15, 70);
+        this.lblFechaEditar.Name = "lblFechaEditar";
+        this.lblFechaEditar.Size = new Size(48, 19);
+        this.lblFechaEditar.TabIndex = 4;
+        this.lblFechaEditar.Text = "Fecha:";
 
-        this.dtpFechaAgendar.Format = DateTimePickerFormat.Short;
-        this.dtpFechaAgendar.Location = new Point(70, 67);
-        this.dtpFechaAgendar.Name = "dtpFechaAgendar";
-        this.dtpFechaAgendar.Size = new Size(150, 25);
-        this.dtpFechaAgendar.TabIndex = 5;
+        this.dtpFechaEditar.Format = DateTimePickerFormat.Short;
+        this.dtpFechaEditar.Location = new Point(70, 67);
+        this.dtpFechaEditar.Name = "dtpFechaEditar";
+        this.dtpFechaEditar.Size = new Size(150, 25);
+        this.dtpFechaEditar.TabIndex = 5;
+        this.dtpFechaEditar.Enabled = false;
 
-        this.lblHoraAgendar.AutoSize = true;
-        this.lblHoraAgendar.Location = new Point(240, 70);
-        this.lblHoraAgendar.Name = "lblHoraAgendar";
-        this.lblHoraAgendar.Size = new Size(42, 19);
-        this.lblHoraAgendar.TabIndex = 6;
-        this.lblHoraAgendar.Text = "Hora:";
+        this.lblHoraEditar.AutoSize = true;
+        this.lblHoraEditar.Location = new Point(240, 70);
+        this.lblHoraEditar.Name = "lblHoraEditar";
+        this.lblHoraEditar.Size = new Size(42, 19);
+        this.lblHoraEditar.TabIndex = 6;
+        this.lblHoraEditar.Text = "Hora:";
 
-        this.dtpHoraAgendar.Format = DateTimePickerFormat.Time;
-        this.dtpHoraAgendar.Location = new Point(290, 67);
-        this.dtpHoraAgendar.Name = "dtpHoraAgendar";
-        this.dtpHoraAgendar.ShowUpDown = true;
-        this.dtpHoraAgendar.Size = new Size(120, 25);
-        this.dtpHoraAgendar.TabIndex = 7;
+        this.dtpHoraEditar.Format = DateTimePickerFormat.Time;
+        this.dtpHoraEditar.Location = new Point(290, 67);
+        this.dtpHoraEditar.Name = "dtpHoraEditar";
+        this.dtpHoraEditar.ShowUpDown = true;
+        this.dtpHoraEditar.Size = new Size(120, 25);
+        this.dtpHoraEditar.TabIndex = 7;
+        this.dtpHoraEditar.Enabled = false;
 
-        this.lblIDVeterinario.AutoSize = true;
-        this.lblIDVeterinario.Location = new Point(15, 110);
-        this.lblIDVeterinario.Name = "lblIDVeterinario";
-        this.lblIDVeterinario.Size = new Size(100, 19);
-        this.lblIDVeterinario.TabIndex = 8;
-        this.lblIDVeterinario.Text = "ID Veterinario:";
+        this.lblVeterinario.AutoSize = true;
+        this.lblVeterinario.Location = new Point(15, 110);
+        this.lblVeterinario.Name = "lblVeterinario";
+        this.lblVeterinario.Size = new Size(78, 19);
+        this.lblVeterinario.TabIndex = 8;
+        this.lblVeterinario.Text = "Veterinario:";
 
-        this.txtIDVeterinario.Location = new Point(120, 107);
-        this.txtIDVeterinario.Name = "txtIDVeterinario";
-        this.txtIDVeterinario.Size = new Size(100, 25);
-        this.txtIDVeterinario.TabIndex = 9;
+        this.cmbVeterinario.DropDownStyle = ComboBoxStyle.DropDownList;
+        this.cmbVeterinario.FormattingEnabled = true;
+        this.cmbVeterinario.Location = new Point(100, 107);
+        this.cmbVeterinario.Name = "cmbVeterinario";
+        this.cmbVeterinario.Size = new Size(470, 25);
+        this.cmbVeterinario.TabIndex = 9;
+        this.cmbVeterinario.Enabled = false;
 
-        this.lblIDServicio.AutoSize = true;
-        this.lblIDServicio.Location = new Point(240, 110);
-        this.lblIDServicio.Name = "lblIDServicio";
-        this.lblIDServicio.Size = new Size(85, 19);
-        this.lblIDServicio.TabIndex = 10;
-        this.lblIDServicio.Text = "ID Servicio:";
+        this.lblServicios.AutoSize = true;
+        this.lblServicios.Location = new Point(15, 150);
+        this.lblServicios.Name = "lblServicios";
+        this.lblServicios.Size = new Size(68, 19);
+        this.lblServicios.TabIndex = 10;
+        this.lblServicios.Text = "Servicios:";
 
-        this.txtIDServicio.Location = new Point(330, 107);
-        this.txtIDServicio.Name = "txtIDServicio";
-        this.txtIDServicio.Size = new Size(100, 25);
-        this.txtIDServicio.TabIndex = 11;
+        this.clbServicios.CheckOnClick = true;
+        this.clbServicios.FormattingEnabled = true;
+        this.clbServicios.Location = new Point(100, 147);
+        this.clbServicios.Name = "clbServicios";
+        this.clbServicios.Size = new Size(470, 100);
+        this.clbServicios.TabIndex = 11;
+        this.clbServicios.Enabled = false;
 
-        this.btnAgendar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-        this.btnAgendar.Location = new Point(15, 150);
-        this.btnAgendar.Name = "btnAgendar";
-        this.btnAgendar.Size = new Size(200, 35);
-        this.btnAgendar.TabIndex = 12;
-        this.btnAgendar.Text = "&Agendar Cita";
-        this.btnAgendar.UseVisualStyleBackColor = true;
-        this.btnAgendar.Click += new EventHandler(this.btnAgendar_Click);
+        this.lblEstado.AutoSize = true;
+        this.lblEstado.Location = new Point(15, 260);
+        this.lblEstado.Name = "lblEstado";
+        this.lblEstado.Size = new Size(50, 19);
+        this.lblEstado.TabIndex = 12;
+        this.lblEstado.Text = "Estado:";
+
+        this.cmbEstado.DropDownStyle = ComboBoxStyle.DropDownList;
+        this.cmbEstado.FormattingEnabled = true;
+        this.cmbEstado.Items.AddRange(new object[] { "Programada", "Completada", "Cancelada" });
+        this.cmbEstado.Location = new Point(100, 257);
+        this.cmbEstado.Name = "cmbEstado";
+        this.cmbEstado.Size = new Size(200, 25);
+        this.cmbEstado.TabIndex = 13;
+        this.cmbEstado.Enabled = false;
+
+        this.btnEditar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+        this.btnEditar.Location = new Point(15, 295);
+        this.btnEditar.Name = "btnEditar";
+        this.btnEditar.Size = new Size(150, 35);
+        this.btnEditar.TabIndex = 14;
+        this.btnEditar.Text = "&Editar";
+        this.btnEditar.UseVisualStyleBackColor = true;
+        this.btnEditar.Click += new EventHandler(this.btnEditar_Click);
+
+        this.btnActualizar.Font = new Font("Segoe UI", 10F);
+        this.btnActualizar.Location = new Point(180, 295);
+        this.btnActualizar.Name = "btnActualizar";
+        this.btnActualizar.Size = new Size(150, 35);
+        this.btnActualizar.TabIndex = 15;
+        this.btnActualizar.Text = "&Actualizar";
+        this.btnActualizar.UseVisualStyleBackColor = true;
+        this.btnActualizar.Click += new EventHandler(this.btnActualizar_Click);
+        this.btnActualizar.Enabled = false;
+
+        this.btnLimpiar.Font = new Font("Segoe UI", 10F);
+        this.btnLimpiar.Location = new Point(345, 295);
+        this.btnLimpiar.Name = "btnLimpiar";
+        this.btnLimpiar.Size = new Size(150, 35);
+        this.btnLimpiar.TabIndex = 16;
+        this.btnLimpiar.Text = "&Limpiar";
+        this.btnLimpiar.UseVisualStyleBackColor = true;
+        this.btnLimpiar.Click += new EventHandler(this.btnLimpiar_Click);
+        this.btnLimpiar.Enabled = false;
 
         // dgvCitas
         this.dgvCitas.AllowUserToAddRows = false;
@@ -215,7 +274,7 @@ partial class CitasForm
         this.dgvCitas.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) | AnchorStyles.Left) | AnchorStyles.Right)));
         this.dgvCitas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
         this.dgvCitas.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        this.dgvCitas.Location = new Point(12, 230);
+        this.dgvCitas.Location = new Point(12, 380);
         this.dgvCitas.Name = "dgvCitas";
         this.dgvCitas.ReadOnly = true;
         this.dgvCitas.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -244,24 +303,24 @@ partial class CitasForm
         this.btnExportarExcel.UseVisualStyleBackColor = true;
         this.btnExportarExcel.Click += new EventHandler(this.btnExportarExcel_Click);
 
-        // lblEstado
-        this.lblEstado.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-        this.lblEstado.AutoSize = true;
-        this.lblEstado.Font = new Font("Segoe UI", 9F);
-        this.lblEstado.Location = new Point(180, 600);
-        this.lblEstado.Name = "lblEstado";
-        this.lblEstado.Size = new Size(0, 15);
-        this.lblEstado.TabIndex = 5;
+        // lblEstadoMensaje
+        this.lblEstadoMensaje.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
+        this.lblEstadoMensaje.AutoSize = true;
+        this.lblEstadoMensaje.Font = new Font("Segoe UI", 9F);
+        this.lblEstadoMensaje.Location = new Point(180, 600);
+        this.lblEstadoMensaje.Name = "lblEstadoMensaje";
+        this.lblEstadoMensaje.Size = new Size(0, 15);
+        this.lblEstadoMensaje.TabIndex = 5;
 
         // CitasForm
         this.AutoScaleDimensions = new SizeF(7F, 15F);
         this.AutoScaleMode = AutoScaleMode.Font;
-        this.ClientSize = new Size(1224, 637);
-        this.Controls.Add(this.lblEstado);
+        this.ClientSize = new Size(1224, 787);
+        this.Controls.Add(this.lblEstadoMensaje);
         this.Controls.Add(this.btnExportarExcel);
         this.Controls.Add(this.btnCancelar);
         this.Controls.Add(this.dgvCitas);
-        this.Controls.Add(this.gbxAgendar);
+        this.Controls.Add(this.gbxEditar);
         this.Controls.Add(this.gbxBuscar);
         this.Font = new Font("Segoe UI", 9F);
         this.MinimumSize = new Size(1240, 676);
@@ -271,8 +330,8 @@ partial class CitasForm
         this.Load += new EventHandler(this.CitasForm_Load);
         this.gbxBuscar.ResumeLayout(false);
         this.gbxBuscar.PerformLayout();
-        this.gbxAgendar.ResumeLayout(false);
-        this.gbxAgendar.PerformLayout();
+        this.gbxEditar.ResumeLayout(false);
+        this.gbxEditar.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)(this.dgvCitas)).EndInit();
         this.ResumeLayout(false);
         this.PerformLayout();

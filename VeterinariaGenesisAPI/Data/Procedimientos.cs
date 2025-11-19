@@ -20,14 +20,30 @@ public static class Procedimientos
 
     // Stored Procedures de Cita
     public const string Cita_Agendar = "sp_Cita_Agendar";
+    public const string Cita_Actualizar = "sp_Cita_Actualizar";
     public const string Cita_Cancelar = "sp_Cita_Cancelar";
     public const string Cita_ListarPorFecha = "sp_Cita_ListarPorFecha";
     public const string Cita_ListarPorVeterinario = "sp_Cita_ListarPorVeterinario";
+    public const string Cita_ListarCompletadasSinFactura = "sp_Cita_ListarCompletadasSinFactura";
 
     // Stored Procedures de Factura
     public const string Factura_CrearDesdeCita = "sp_Factura_CrearDesdeCita";
     public const string Factura_AgregarItem = "sp_Factura_AgregarItem";
     public const string Factura_Pagar = "sp_Factura_Pagar";
+    public const string Factura_BuscarPorID = "sp_Factura_BuscarPorID";
+    public const string Factura_Listar = "sp_Factura_Listar";
+    public const string Factura_DetallesPorID = "sp_Factura_DetallesPorID";
+
+    // Stored Procedures de Veterinario
+    public const string Veterinario_ListarActivos = "sp_Veterinario_ListarActivos";
+    public const string Veterinario_BuscarPorID = "sp_Veterinario_BuscarPorID";
+
+    // Stored Procedures de Servicio
+    public const string Servicio_Listar = "sp_Servicio_Listar";
+    public const string Servicio_BuscarPorID = "sp_Servicio_BuscarPorID";
+    public const string Servicio_Crear = "sp_Servicio_Crear";
+    public const string Servicio_Actualizar = "sp_Servicio_Actualizar";
+    public const string Servicio_Eliminar = "sp_Servicio_Eliminar";
 
     // Stored Procedures de Reportes
     public const string Reporte_Propietarios = "sp_Reporte_Propietarios";

@@ -30,5 +30,16 @@ public class FacturaRepository : IFacturaRepository
     {
         await _apiClient.PostAsync("Factura/pagar", dto);
     }
+
+    public async Task<FacturaDto?> BuscarPorIDAsync(int id)
+    {
+        return await _apiClient.GetAsync<FacturaDto>($"Factura/{id}");
+    }
+
+    public async Task<List<FacturaDto>> ListarAsync()
+    {
+        var resultado = await _apiClient.GetAsync<List<FacturaDto>>("Factura");
+        return resultado ?? new List<FacturaDto>();
+    }
 }
 

@@ -11,25 +11,34 @@ public partial class CitasForm : Form
     private readonly ICitaRepository _citaRepository;
     private readonly IPropietarioRepository _propietarioRepository;
     private readonly IMascotaRepository _mascotaRepository;
+    private readonly IVeterinarioRepository _veterinarioRepository;
+    private readonly IServicioRepository _servicioRepository;
     private List<CitaDto> _citas = new();
     private List<PropietarioDto> _propietarios = new();
     private List<MascotaDto> _mascotas = new();
+    private List<VeterinarioDto> _veterinarios = new();
+    private List<ServicioDto> _servicios = new();
     private CitaDto? _citaSeleccionada;
+    private bool _modoEdicion = false;
 
-    public CitasForm(ICitaRepository citaRepository, IPropietarioRepository propietarioRepository, IMascotaRepository mascotaRepository)
+    public CitasForm(ICitaRepository citaRepository, IPropietarioRepository propietarioRepository, IMascotaRepository mascotaRepository, IVeterinarioRepository veterinarioRepository, IServicioRepository servicioRepository)
     {
         InitializeComponent();
         _citaRepository = citaRepository;
         _propietarioRepository = propietarioRepository;
         _mascotaRepository = mascotaRepository;
+        _veterinarioRepository = veterinarioRepository;
+        _servicioRepository = servicioRepository;
     }
 
     private async void CitasForm_Load(object? sender, EventArgs e)
     {
         AplicarColoresVeterinaria();
         await CargarPropietariosAsync();
+        await CargarVeterinariosAsync();
+        await CargarServiciosAsync();
         dtpFechaBuscar.Value = DateTime.Today;
-        cmbPropietario.SelectedIndexChanged += CmbPropietario_SelectedIndexChanged;
+        ConfigurarModoEdicion(false);
     }
 
     private void AplicarColoresVeterinaria()
@@ -39,7 +48,7 @@ public partial class CitasForm : Form
         
         // GroupBoxes con colores suaves
         gbxBuscar.BackColor = Color.FromArgb(255, 255, 255); // Blanco
-        gbxAgendar.BackColor = Color.FromArgb(255, 255, 255); // Blanco
+        gbxEditar.BackColor = Color.FromArgb(255, 255, 255); // Blanco
         
         // Botones con colores temáticos
         btnBuscarPorFecha.BackColor = Color.FromArgb(255, 152, 0); // Naranja suave
@@ -47,15 +56,20 @@ public partial class CitasForm : Form
         btnBuscarPorFecha.FlatStyle = FlatStyle.Flat;
         btnBuscarPorFecha.FlatAppearance.BorderSize = 0;
         
-        btnAgendar.BackColor = Color.FromArgb(76, 175, 80); // Verde
-        btnAgendar.ForeColor = Color.White;
-        btnAgendar.FlatStyle = FlatStyle.Flat;
-        btnAgendar.FlatAppearance.BorderSize = 0;
+        btnActualizar.BackColor = Color.FromArgb(33, 150, 243); // Azul
+        btnActualizar.ForeColor = Color.White;
+        btnActualizar.FlatStyle = FlatStyle.Flat;
+        btnActualizar.FlatAppearance.BorderSize = 0;
         
         btnCancelar.BackColor = Color.FromArgb(244, 67, 54); // Rojo suave
         btnCancelar.ForeColor = Color.White;
         btnCancelar.FlatStyle = FlatStyle.Flat;
         btnCancelar.FlatAppearance.BorderSize = 0;
+        
+        btnLimpiar.BackColor = Color.FromArgb(158, 158, 158); // Gris
+        btnLimpiar.ForeColor = Color.White;
+        btnLimpiar.FlatStyle = FlatStyle.Flat;
+        btnLimpiar.FlatAppearance.BorderSize = 0;
         
         btnExportarExcel.BackColor = Color.FromArgb(76, 175, 80); // Verde
         btnExportarExcel.ForeColor = Color.White;
@@ -123,27 +137,64 @@ public partial class CitasForm : Form
         }
     }
 
+    private async Task CargarVeterinariosAsync()
+    {
+        try
+        {
+            _veterinarios = await _veterinarioRepository.ListarActivosAsync();
+            var veterinariosList = _veterinarios.Select(v => new { 
+                ID = v.ID_Veterinario, 
+                NombreCompleto = $"{v.Nombre} {(string.IsNullOrEmpty(v.Especialidad) ? "" : $"({v.Especialidad})")}" 
+            }).ToList();
+            cmbVeterinario.DataSource = veterinariosList;
+            cmbVeterinario.DisplayMember = "NombreCompleto";
+            cmbVeterinario.ValueMember = "ID";
+            cmbVeterinario.SelectedIndex = -1;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error al cargar veterinarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private async Task CargarServiciosAsync()
+    {
+        try
+        {
+            _servicios = await _servicioRepository.ListarAsync();
+            clbServicios.Items.Clear();
+            foreach (var servicio in _servicios)
+            {
+                clbServicios.Items.Add($"{servicio.Nombre} - ${servicio.Costo:F2}", false);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error al cargar servicios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
     private async void btnBuscarPorFecha_Click(object? sender, EventArgs e)
     {
         try
         {
             btnBuscarPorFecha.Enabled = false;
-            lblEstado.Text = "Buscando citas...";
-            lblEstado.ForeColor = Color.Blue;
+            lblEstadoMensaje.Text = "Buscando citas...";
+            lblEstadoMensaje.ForeColor = Color.Blue;
             Cursor = Cursors.WaitCursor;
 
             _citas = await _citaRepository.ListarPorFechaAsync(dtpFechaBuscar.Value);
             dgvCitas.DataSource = _citas;
             ConfigurarDataGridView();
 
-            lblEstado.Text = $"Se encontraron {_citas.Count} citas para la fecha seleccionada";
-            lblEstado.ForeColor = Color.Green;
+            lblEstadoMensaje.Text = $"Se encontraron {_citas.Count} citas para la fecha seleccionada";
+            lblEstadoMensaje.ForeColor = Color.Green;
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error al buscar citas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            lblEstado.Text = "Error al buscar datos";
-            lblEstado.ForeColor = Color.Red;
+            lblEstadoMensaje.Text = "Error al buscar datos";
+            lblEstadoMensaje.ForeColor = Color.Red;
         }
         finally
         {
@@ -169,29 +220,152 @@ public partial class CitasForm : Form
             if (cell?.Value != null && cell.Value is int id)
             {
                 _citaSeleccionada = _citas.FirstOrDefault(c => c.ID_Cita == id);
+                if (_citaSeleccionada != null && !_modoEdicion)
+                {
+                    CargarDatosEnFormulario(_citaSeleccionada);
+                }
             }
         }
     }
 
-    private async void btnAgendar_Click(object? sender, EventArgs e)
+    private void CargarDatosEnFormulario(CitaDto cita)
+    {
+        // Cargar propietario
+        var propietario = _propietarios.FirstOrDefault(p => p.ID_Propietario == cita.ID_Propietario);
+        if (propietario != null)
+        {
+            var propItem = cmbPropietario.Items.Cast<object>().FirstOrDefault(item =>
+            {
+                var id = item.GetType().GetProperty("ID")?.GetValue(item);
+                return id != null && id.Equals(propietario.ID_Propietario);
+            });
+            if (propItem != null)
+            {
+                cmbPropietario.SelectedItem = propItem;
+            }
+        }
+
+        // Cargar mascota (se cargará automáticamente cuando se seleccione el propietario)
+        // Esperar un momento para que se carguen las mascotas
+        Application.DoEvents();
+        if (cmbMascota.Items.Count > 0)
+        {
+            var mascotaItem = cmbMascota.Items.Cast<object>().FirstOrDefault(item =>
+            {
+                var id = item.GetType().GetProperty("ID")?.GetValue(item);
+                return id != null && id.Equals(cita.ID_Mascota);
+            });
+            if (mascotaItem != null)
+            {
+                cmbMascota.SelectedItem = mascotaItem;
+            }
+        }
+
+        // Cargar veterinario
+        var veterinarioItem = cmbVeterinario.Items.Cast<object>().FirstOrDefault(item =>
+        {
+            var id = item.GetType().GetProperty("ID")?.GetValue(item);
+            return id != null && id.Equals(cita.ID_Veterinario);
+        });
+        if (veterinarioItem != null)
+        {
+            cmbVeterinario.SelectedItem = veterinarioItem;
+        }
+
+        // Cargar servicio
+        for (int i = 0; i < clbServicios.Items.Count; i++)
+        {
+            var texto = clbServicios.Items[i].ToString() ?? "";
+            var nombreServicio = texto.Split('-')[0].Trim();
+            var servicio = _servicios.FirstOrDefault(s => s.Nombre == nombreServicio && s.ID_Servicio == cita.ID_Servicio);
+            clbServicios.SetItemChecked(i, servicio != null);
+        }
+
+        // Cargar fecha y hora
+        dtpFechaEditar.Value = cita.Fecha;
+        dtpHoraEditar.Value = new DateTime(cita.Fecha.Year, cita.Fecha.Month, cita.Fecha.Day).Add(cita.Hora);
+
+        // Cargar estado
+        cmbEstado.Text = cita.Estado;
+    }
+
+    private void ConfigurarModoEdicion(bool modoEdicion)
+    {
+        _modoEdicion = modoEdicion;
+        cmbPropietario.Enabled = modoEdicion;
+        cmbMascota.Enabled = modoEdicion;
+        cmbVeterinario.Enabled = modoEdicion;
+        clbServicios.Enabled = modoEdicion;
+        dtpFechaEditar.Enabled = modoEdicion;
+        dtpHoraEditar.Enabled = modoEdicion;
+        cmbEstado.Enabled = modoEdicion;
+        btnActualizar.Enabled = modoEdicion;
+        btnLimpiar.Enabled = modoEdicion;
+    }
+
+    private void LimpiarFormulario()
+    {
+        cmbPropietario.SelectedIndex = -1;
+        cmbMascota.DataSource = null;
+        cmbMascota.Items.Clear();
+        cmbVeterinario.SelectedIndex = -1;
+        for (int i = 0; i < clbServicios.Items.Count; i++)
+        {
+            clbServicios.SetItemChecked(i, false);
+        }
+        dtpFechaEditar.Value = DateTime.Today;
+        dtpHoraEditar.Value = DateTime.Now;
+        cmbEstado.SelectedIndex = -1;
+        _citaSeleccionada = null;
+        ConfigurarModoEdicion(false);
+    }
+
+    private async void btnActualizar_Click(object? sender, EventArgs e)
     {
         try
         {
+            if (_citaSeleccionada == null)
+            {
+                MessageBox.Show("Seleccione una cita para actualizar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             if (cmbMascota.SelectedItem == null)
             {
                 MessageBox.Show("Debe seleccionar una mascota.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(txtIDVeterinario.Text) || !int.TryParse(txtIDVeterinario.Text, out var idVeterinario))
+            if (cmbVeterinario.SelectedItem == null)
             {
-                MessageBox.Show("Debe ingresar un ID de veterinario válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Debe seleccionar un veterinario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(txtIDServicio.Text) || !int.TryParse(txtIDServicio.Text, out var idServicio))
+            // Obtener servicio seleccionado (solo uno para actualizar)
+            int? idServicio = null;
+            for (int i = 0; i < clbServicios.Items.Count; i++)
             {
-                MessageBox.Show("Debe ingresar un ID de servicio válido.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (clbServicios.GetItemChecked(i))
+                {
+                    var texto = clbServicios.Items[i].ToString() ?? "";
+                    var nombreServicio = texto.Split('-')[0].Trim();
+                    var servicio = _servicios.FirstOrDefault(s => s.Nombre == nombreServicio);
+                    if (servicio != null)
+                    {
+                        if (idServicio != null)
+                        {
+                            MessageBox.Show("Solo puede seleccionar un servicio para actualizar la cita.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                        idServicio = servicio.ID_Servicio;
+                    }
+                }
+            }
+
+            if (idServicio == null)
+            {
+                MessageBox.Show("Debe seleccionar un servicio.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -207,33 +381,72 @@ public partial class CitasForm : Form
                 MessageBox.Show("Error al obtener el ID de la mascota.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            var idMascota = mascotaIdInt;
 
-            var dto = new CitaCreateDto
+            var veterinarioItem = cmbVeterinario.SelectedItem;
+            if (veterinarioItem == null)
             {
-                Fecha = dtpFechaAgendar.Value.Date,
-                Hora = dtpHoraAgendar.Value.TimeOfDay,
-                ID_Mascota = idMascota,
-                ID_Veterinario = idVeterinario,
-                ID_Servicio = idServicio
+                MessageBox.Show("Debe seleccionar un veterinario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            var veterinarioId = veterinarioItem.GetType().GetProperty("ID")?.GetValue(veterinarioItem);
+            if (veterinarioId == null || !(veterinarioId is int veterinarioIdInt))
+            {
+                MessageBox.Show("Error al obtener el ID del veterinario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(cmbEstado.Text))
+            {
+                MessageBox.Show("Debe seleccionar un estado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            btnActualizar.Enabled = false;
+            lblEstadoMensaje.Text = "Actualizando cita...";
+            lblEstadoMensaje.ForeColor = Color.Blue;
+
+            var dto = new CitaUpdateDto
+            {
+                ID_Cita = _citaSeleccionada.ID_Cita,
+                Fecha = dtpFechaEditar.Value.Date,
+                Hora = dtpHoraEditar.Value.TimeOfDay,
+                ID_Mascota = mascotaIdInt,
+                ID_Veterinario = veterinarioIdInt,
+                ID_Servicio = idServicio.Value,
+                Estado = cmbEstado.Text
             };
 
-            btnAgendar.Enabled = false;
-            lblEstado.Text = "Agendando cita...";
-            lblEstado.ForeColor = Color.Blue;
-
-            await _citaRepository.AgendarAsync(dto);
-            MessageBox.Show("Cita agendada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            await _citaRepository.ActualizarAsync(dto);
+            MessageBox.Show("Cita actualizada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            
+            LimpiarFormulario();
             btnBuscarPorFecha_Click(sender, e);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error al agendar cita: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Error al actualizar cita: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         finally
         {
-            btnAgendar.Enabled = true;
+            btnActualizar.Enabled = true;
         }
+    }
+
+    private void btnEditar_Click(object? sender, EventArgs e)
+    {
+        if (_citaSeleccionada == null)
+        {
+            MessageBox.Show("Seleccione una cita para editar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        ConfigurarModoEdicion(true);
+        CargarDatosEnFormulario(_citaSeleccionada);
+    }
+
+    private void btnLimpiar_Click(object? sender, EventArgs e)
+    {
+        LimpiarFormulario();
     }
 
     private async void btnCancelar_Click(object? sender, EventArgs e)
@@ -261,8 +474,8 @@ public partial class CitasForm : Form
             if (resultado == DialogResult.Yes)
             {
                 btnCancelar.Enabled = false;
-                lblEstado.Text = "Cancelando cita...";
-                lblEstado.ForeColor = Color.Blue;
+                lblEstadoMensaje.Text = "Cancelando cita...";
+                lblEstadoMensaje.ForeColor = Color.Blue;
 
                 await _citaRepository.CancelarAsync(_citaSeleccionada.ID_Cita);
                 MessageBox.Show("Cita cancelada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
