@@ -52,6 +52,17 @@ CREATE PROCEDURE sp_Propietario_Crear
     @Telefono VARCHAR(20) = NULL
 AS
 BEGIN
+    -- Validar si ya existe un propietario activo con el mismo nombre
+    IF EXISTS (
+        SELECT 1 FROM Propietario 
+        WHERE LOWER(LTRIM(RTRIM(Nombre))) = LOWER(LTRIM(RTRIM(@Nombre)))
+          AND Activo = 1
+    )
+    BEGIN
+        RAISERROR('Ya existe un propietario activo con el nombre "%s". No se pueden registrar propietarios con nombres duplicados.', 16, 1, @Nombre);
+        RETURN;
+    END
+
     INSERT INTO Propietario (Nombre, Apellidos, Direccion, Telefono, Activo)
     VALUES (@Nombre, @Apellidos, @Direccion, @Telefono, 1);
     SELECT SCOPE_IDENTITY() AS NuevoID;
@@ -260,8 +271,20 @@ CREATE PROCEDURE sp_Cita_ListarPorFecha
     @Fecha DATE
 AS
 BEGIN
-    SELECT C.*, M.Nombre AS Mascota, V.Nombre AS Veterinario, S.Nombre AS Servicio,
-           P.Nombre + ' ' + P.Apellidos AS Propietario
+    SET NOCOUNT ON;
+    SELECT 
+        C.ID_Cita,
+        C.Fecha,
+        C.Hora,
+        C.Estado,
+        C.ID_Mascota,
+        M.Nombre AS Mascota,
+        M.ID_Propietario AS ID_Propietario,
+        P.Nombre + ' ' + P.Apellidos AS Propietario,
+        C.ID_Veterinario,
+        V.Nombre AS Veterinario,
+        C.ID_Servicio,
+        S.Nombre AS Servicio
     FROM Cita C
     JOIN Mascota M ON C.ID_Mascota = M.ID_Mascota
     JOIN Propietario P ON M.ID_Propietario = P.ID_Propietario
@@ -278,8 +301,20 @@ CREATE PROCEDURE sp_Cita_ListarPorVeterinario
     @ID_Veterinario INT
 AS
 BEGIN
-    SELECT C.*, M.Nombre AS Mascota, V.Nombre AS Veterinario, S.Nombre AS Servicio,
-           P.Nombre + ' ' + P.Apellidos AS Propietario
+    SET NOCOUNT ON;
+    SELECT 
+        C.ID_Cita,
+        C.Fecha,
+        C.Hora,
+        C.Estado,
+        C.ID_Mascota,
+        M.Nombre AS Mascota,
+        M.ID_Propietario AS ID_Propietario,
+        P.Nombre + ' ' + P.Apellidos AS Propietario,
+        C.ID_Veterinario,
+        V.Nombre AS Veterinario,
+        C.ID_Servicio,
+        S.Nombre AS Servicio
     FROM Cita C
     JOIN Mascota M ON C.ID_Mascota = M.ID_Mascota
     JOIN Propietario P ON M.ID_Propietario = P.ID_Propietario
@@ -298,8 +333,19 @@ CREATE PROCEDURE sp_Cita_ListarCompletadasSinFactura
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT C.*, M.Nombre AS Mascota, V.Nombre AS Veterinario, S.Nombre AS Servicio,
-           P.Nombre + ' ' + P.Apellidos AS Propietario
+    SELECT 
+        C.ID_Cita,
+        C.Fecha,
+        C.Hora,
+        C.Estado,
+        C.ID_Mascota,
+        M.Nombre AS Mascota,
+        M.ID_Propietario AS ID_Propietario,
+        P.Nombre + ' ' + P.Apellidos AS Propietario,
+        C.ID_Veterinario,
+        V.Nombre AS Veterinario,
+        C.ID_Servicio,
+        S.Nombre AS Servicio
     FROM Cita C
     JOIN Mascota M ON C.ID_Mascota = M.ID_Mascota
     JOIN Propietario P ON M.ID_Propietario = P.ID_Propietario

@@ -13,6 +13,8 @@ public partial class MascotasForm : Form
     private List<MascotaDto> _mascotas = new();
     private List<PropietarioDto> _propietarios = new();
     private MascotaDto? _mascotaSeleccionada;
+    private bool _cargandoMascotas = false; // Flag para evitar llamadas simultáneas
+    private int _propietarioSeleccionadoId = -1; // Para evitar recargar si es el mismo
 
     public MascotasForm(IMascotaRepository mascotaRepository, IPropietarioRepository propietarioRepository)
     {
@@ -24,8 +26,22 @@ public partial class MascotasForm : Form
     private async void MascotasForm_Load(object? sender, EventArgs e)
     {
         AplicarColoresVeterinaria();
+        ConfigurarDataGridViewPropietarios();
         await CargarPropietariosAsync();
-        cmbPropietario.SelectedIndexChanged += CmbPropietario_SelectedIndexChanged;
+    }
+
+    private void ConfigurarDataGridViewPropietarios()
+    {
+        dgvPropietarios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+        dgvPropietarios.AllowUserToAddRows = false;
+        dgvPropietarios.ReadOnly = true;
+        dgvPropietarios.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        dgvPropietarios.BackgroundColor = Color.FromArgb(250, 250, 250);
+        dgvPropietarios.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 248, 255);
+        dgvPropietarios.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(76, 175, 80);
+        dgvPropietarios.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+        dgvPropietarios.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+        dgvPropietarios.EnableHeadersVisualStyles = false;
     }
 
     private void AplicarColoresVeterinaria()
@@ -75,6 +91,10 @@ public partial class MascotasForm : Form
         dgvMascotas.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
         dgvMascotas.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
         dgvMascotas.EnableHeadersVisualStyles = false;
+        
+        // TextBox de búsqueda
+        txtBuscarPropietario.BackColor = Color.White;
+        txtBuscarPropietario.ForeColor = Color.Black;
     }
 
     private async Task CargarPropietariosAsync()
@@ -82,13 +102,14 @@ public partial class MascotasForm : Form
         try
         {
             _propietarios = await _propietarioRepository.ListarActivosAsync();
-            cmbPropietario.DataSource = _propietarios.Select(p => new { 
-                ID = p.ID_Propietario, 
-                NombreCompleto = $"{p.Nombre} {p.Apellidos}" 
-            }).ToList();
-            cmbPropietario.DisplayMember = "NombreCompleto";
-            cmbPropietario.ValueMember = "ID";
-            cmbPropietario.SelectedIndex = -1;
+            dgvPropietarios.DataSource = _propietarios;
+            txtBuscarPropietario.Clear();
+            
+            // Asegurar que la columna ID_Propietario esté visible
+            if (dgvPropietarios.Columns["ID_Propietario"] != null)
+            {
+                dgvPropietarios.Columns["ID_Propietario"].Visible = true;
+            }
         }
         catch (Exception ex)
         {
@@ -96,21 +117,94 @@ public partial class MascotasForm : Form
         }
     }
 
-    private async void CmbPropietario_SelectedIndexChanged(object? sender, EventArgs e)
+    private void TxtBuscarPropietario_TextChanged(object? sender, EventArgs e)
     {
-        if (cmbPropietario.SelectedItem != null)
+        try
         {
-            var propItem = cmbPropietario.SelectedItem;
-            var propId = propItem.GetType().GetProperty("ID")?.GetValue(propItem);
-            if (propId != null && propId is int propIdInt)
+            var textoBusqueda = txtBuscarPropietario.Text.Trim();
+            
+            if (string.IsNullOrWhiteSpace(textoBusqueda))
             {
-                await CargarMascotasAsync(propIdInt);
+                // Si no hay texto, mostrar todos los propietarios
+                dgvPropietarios.DataSource = _propietarios;
             }
+            else
+            {
+                // Filtrar propietarios por nombre o apellidos (búsqueda parcial, case-insensitive)
+                var propietariosFiltrados = _propietarios.Where(p => 
+                    (p.Nombre ?? "").Contains(textoBusqueda, StringComparison.OrdinalIgnoreCase) ||
+                    (p.Apellidos ?? "").Contains(textoBusqueda, StringComparison.OrdinalIgnoreCase) ||
+                    $"{p.Nombre} {p.Apellidos}".Contains(textoBusqueda, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+                
+                dgvPropietarios.DataSource = propietariosFiltrados;
+                
+                lblEstado.Text = $"Se encontraron {propietariosFiltrados.Count} propietario(s) para '{textoBusqueda}'";
+                lblEstado.ForeColor = propietariosFiltrados.Count > 0 ? Color.Green : Color.Orange;
+            }
+            
+            // Asegurar que la columna ID_Propietario esté visible
+            if (dgvPropietarios.Columns["ID_Propietario"] != null)
+            {
+                dgvPropietarios.Columns["ID_Propietario"].Visible = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            lblEstado.Text = $"Error al filtrar: {ex.Message}";
+            lblEstado.ForeColor = Color.Red;
+        }
+    }
+
+    private async void DgvPropietarios_SelectionChanged(object? sender, EventArgs e)
+    {
+        try
+        {
+            // Evitar llamadas simultáneas
+            if (_cargandoMascotas)
+            {
+                return;
+            }
+
+            if (dgvPropietarios.SelectedRows.Count > 0 && dgvPropietarios.SelectedRows[0] != null)
+            {
+                var propietarioCell = dgvPropietarios.SelectedRows[0].Cells["ID_Propietario"];
+                if (propietarioCell?.Value != null && int.TryParse(propietarioCell.Value.ToString(), out var propIdInt))
+                {
+                    // Evitar recargar si es el mismo propietario
+                    if (_propietarioSeleccionadoId == propIdInt && _mascotas.Count > 0)
+                    {
+                        return;
+                    }
+
+                    _propietarioSeleccionadoId = propIdInt;
+                    await CargarMascotasAsync(propIdInt);
+                }
+            }
+            else
+            {
+                // Si no hay selección, limpiar
+                _propietarioSeleccionadoId = -1;
+                dgvMascotas.DataSource = null;
+                _mascotas.Clear();
+                LimpiarFormulario();
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error al seleccionar propietario: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
     private async Task CargarMascotasAsync(int idPropietario)
     {
+        // Protección contra llamadas simultáneas
+        if (_cargandoMascotas)
+        {
+            return;
+        }
+
+        _cargandoMascotas = true;
         try
         {
             btnCargar.Enabled = false;
@@ -130,11 +224,13 @@ public partial class MascotasForm : Form
             MessageBox.Show($"Error al cargar mascotas: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             lblEstado.Text = "Error al cargar datos";
             lblEstado.ForeColor = Color.Red;
+            _propietarioSeleccionadoId = -1; // Reset en caso de error
         }
         finally
         {
             btnCargar.Enabled = true;
             Cursor = Cursors.Default;
+            _cargandoMascotas = false;
         }
     }
 
@@ -174,13 +270,16 @@ public partial class MascotasForm : Form
         txtRaza.Text = _mascotaSeleccionada.Raza ?? "";
         txtEdad.Text = _mascotaSeleccionada.Edad?.ToString() ?? "";
         cmbSexo.Text = _mascotaSeleccionada.Sexo;
-        for (int i = 0; i < cmbPropietario.Items.Count; i++)
+        
+        // Seleccionar el propietario en el DataGridView
+        dgvPropietarios.ClearSelection();
+        foreach (DataGridViewRow row in dgvPropietarios.Rows)
         {
-            var item = cmbPropietario.Items[i];
-            var itemId = item?.GetType().GetProperty("ID")?.GetValue(item);
-            if (itemId != null && itemId is int itemIdInt && itemIdInt == _mascotaSeleccionada.ID_Propietario)
+            var propietarioIdCell = row.Cells["ID_Propietario"];
+            if (propietarioIdCell?.Value != null && int.TryParse(propietarioIdCell.Value.ToString(), out var propId) && propId == _mascotaSeleccionada.ID_Propietario)
             {
-                cmbPropietario.SelectedIndex = i;
+                row.Selected = true;
+                dgvPropietarios.FirstDisplayedScrollingRowIndex = row.Index;
                 break;
             }
         }
@@ -200,9 +299,9 @@ public partial class MascotasForm : Form
     {
         try
         {
-            if (cmbPropietario.SelectedItem == null)
+            if (dgvPropietarios.SelectedRows.Count == 0 || dgvPropietarios.SelectedRows[0] == null)
             {
-                MessageBox.Show("Debe seleccionar un propietario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Debe seleccionar un propietario del listado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -212,19 +311,13 @@ public partial class MascotasForm : Form
                 return;
             }
 
-            var propItemNuevo = cmbPropietario.SelectedItem;
-            if (propItemNuevo == null)
-            {
-                MessageBox.Show("Debe seleccionar un propietario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            var propIdNuevo = propItemNuevo.GetType().GetProperty("ID")?.GetValue(propItemNuevo);
-            if (propIdNuevo == null || !(propIdNuevo is int propIdIntNuevo))
+            // Obtener el ID del propietario seleccionado
+            var propietarioIdCellNuevo = dgvPropietarios.SelectedRows[0].Cells["ID_Propietario"];
+            if (propietarioIdCellNuevo?.Value == null || !int.TryParse(propietarioIdCellNuevo.Value.ToString(), out var idPropietario))
             {
                 MessageBox.Show("Error al obtener el ID del propietario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            var idPropietario = propIdIntNuevo;
 
             var dto = new MascotaCreateDto
             {
@@ -243,11 +336,12 @@ public partial class MascotasForm : Form
             await _mascotaRepository.CrearAsync(dto);
             MessageBox.Show("Mascota creada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
             LimpiarFormulario();
-            if (cmbPropietario.SelectedItem != null)
+            
+            // Recargar mascotas del propietario seleccionado
+            if (dgvPropietarios.SelectedRows.Count > 0)
             {
-                var propItem3 = cmbPropietario.SelectedItem;
-                var propId3 = propItem3.GetType().GetProperty("ID")?.GetValue(propItem3);
-                if (propId3 != null && propId3 is int propIdInt3)
+                var propietarioIdCellRecargar = dgvPropietarios.SelectedRows[0].Cells["ID_Propietario"];
+                if (propietarioIdCellRecargar?.Value != null && int.TryParse(propietarioIdCellRecargar.Value.ToString(), out var propIdInt3))
                 {
                     await CargarMascotasAsync(propIdInt3);
                 }
@@ -279,19 +373,19 @@ public partial class MascotasForm : Form
                 return;
             }
 
-            var propItemActualizar = cmbPropietario.SelectedItem;
-            if (propItemActualizar == null)
+            // Obtener el ID del propietario seleccionado
+            if (dgvPropietarios.SelectedRows.Count == 0 || dgvPropietarios.SelectedRows[0] == null)
             {
-                MessageBox.Show("Debe seleccionar un propietario.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Debe seleccionar un propietario del listado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            var propIdActualizar = propItemActualizar.GetType().GetProperty("ID")?.GetValue(propItemActualizar);
-            if (propIdActualizar == null || !(propIdActualizar is int propIdIntActualizar))
+            
+            var propietarioIdCellActualizar = dgvPropietarios.SelectedRows[0].Cells["ID_Propietario"];
+            if (propietarioIdCellActualizar?.Value == null || !int.TryParse(propietarioIdCellActualizar.Value.ToString(), out var idPropietario))
             {
                 MessageBox.Show("Error al obtener el ID del propietario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            var idPropietario = propIdIntActualizar;
 
             var dto = new MascotaUpdateDto
             {
@@ -310,11 +404,12 @@ public partial class MascotasForm : Form
 
             await _mascotaRepository.ActualizarAsync(dto);
             MessageBox.Show("Mascota actualizada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            if (cmbPropietario.SelectedItem != null)
+            
+            // Recargar mascotas del propietario seleccionado
+            if (dgvPropietarios.SelectedRows.Count > 0)
             {
-                var propItem4 = cmbPropietario.SelectedItem;
-                var propId4 = propItem4.GetType().GetProperty("ID")?.GetValue(propItem4);
-                if (propId4 != null && propId4 is int propIdInt4)
+                var propietarioIdCellActualizarRecargar = dgvPropietarios.SelectedRows[0].Cells["ID_Propietario"];
+                if (propietarioIdCellActualizarRecargar?.Value != null && int.TryParse(propietarioIdCellActualizarRecargar.Value.ToString(), out var propIdInt4))
                 {
                     await CargarMascotasAsync(propIdInt4);
                 }
@@ -334,7 +429,9 @@ public partial class MascotasForm : Form
     {
         LimpiarFormulario();
         _mascotaSeleccionada = null;
+        _propietarioSeleccionadoId = -1;
         dgvMascotas.ClearSelection();
+        dgvPropietarios.ClearSelection();
     }
 
     private async void btnEliminar_Click(object? sender, EventArgs e)
@@ -365,11 +462,12 @@ public partial class MascotasForm : Form
                 MessageBox.Show("Mascota eliminada exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 
                 LimpiarFormulario();
-                if (cmbPropietario.SelectedItem != null)
+                
+                // Recargar mascotas del propietario seleccionado
+                if (dgvPropietarios.SelectedRows.Count > 0)
                 {
-                    var propItem = cmbPropietario.SelectedItem;
-                    var propId = propItem.GetType().GetProperty("ID")?.GetValue(propItem);
-                    if (propId != null && propId is int propIdInt)
+                    var propietarioIdCellEliminar = dgvPropietarios.SelectedRows[0].Cells["ID_Propietario"];
+                    if (propietarioIdCellEliminar?.Value != null && int.TryParse(propietarioIdCellEliminar.Value.ToString(), out var propIdInt))
                     {
                         await CargarMascotasAsync(propIdInt);
                     }
@@ -391,11 +489,10 @@ public partial class MascotasForm : Form
 
     private async void btnCargar_Click(object? sender, EventArgs e)
     {
-        if (cmbPropietario.SelectedItem != null)
+        if (dgvPropietarios.SelectedRows.Count > 0 && dgvPropietarios.SelectedRows[0] != null)
         {
-            var propItem = cmbPropietario.SelectedItem;
-            var propId = propItem.GetType().GetProperty("ID")?.GetValue(propItem);
-            if (propId != null && propId is int propIdInt)
+            var propietarioIdCellCargar = dgvPropietarios.SelectedRows[0].Cells["ID_Propietario"];
+            if (propietarioIdCellCargar?.Value != null && int.TryParse(propietarioIdCellCargar.Value.ToString(), out var propIdInt))
             {
                 await CargarMascotasAsync(propIdInt);
             }
@@ -406,7 +503,7 @@ public partial class MascotasForm : Form
         }
         else
         {
-            MessageBox.Show("Seleccione un propietario primero.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Seleccione un propietario del listado primero.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 

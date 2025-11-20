@@ -203,6 +203,24 @@ public partial class PropietariosForm : Form
                 return;
             }
 
+            // Validar que no exista un propietario activo con el mismo nombre
+            var nombreIngresado = txtNombre.Text.Trim();
+            var existePropietario = _propietarios.Any(p => 
+                p.Activo && 
+                string.Equals(p.Nombre.Trim(), nombreIngresado, StringComparison.OrdinalIgnoreCase));
+            
+            if (existePropietario)
+            {
+                MessageBox.Show(
+                    $"Ya existe un propietario activo con el nombre '{nombreIngresado}'.\n\nNo se pueden registrar propietarios con nombres duplicados.",
+                    "Validación",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+                txtNombre.Focus();
+                txtNombre.SelectAll();
+                return;
+            }
+
             var dto = new PropietarioCreateDto
             {
                 Nombre = txtNombre.Text.Trim(),

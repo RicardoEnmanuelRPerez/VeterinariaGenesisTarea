@@ -5,8 +5,9 @@ partial class FacturasForm
 {
     private System.ComponentModel.IContainer? components = null;
     private GroupBox gbxCrearFactura = null!;
-    private Label lblCita = null!;
-    private ComboBox cmbCita = null!;
+    private Label lblBuscarPropietario = null!;
+    private TextBox txtBuscarPropietario = null!;
+    private DataGridView dgvCitas = null!;
     private Button btnCrearFactura = null!;
     private Button btnRecargarCitas = null!;
     private GroupBox gbxAgregarItem = null!;
@@ -50,8 +51,9 @@ partial class FacturasForm
     private void InitializeComponent()
     {
         gbxCrearFactura = new GroupBox();
-        lblCita = new Label();
-        cmbCita = new ComboBox();
+        lblBuscarPropietario = new Label();
+        txtBuscarPropietario = new TextBox();
+        dgvCitas = new DataGridView();
         btnCrearFactura = new Button();
         btnRecargarCitas = new Button();
         gbxAgregarItem = new GroupBox();
@@ -83,6 +85,7 @@ partial class FacturasForm
         lblSubtotal = new Label();
         dgvDetalles = new DataGridView();
         gbxCrearFactura.SuspendLayout();
+        ((System.ComponentModel.ISupportInitialize)dgvCitas).BeginInit();
         gbxAgregarItem.SuspendLayout();
         gbxDatosCita.SuspendLayout();
         gbxHistorial.SuspendLayout();
@@ -93,8 +96,9 @@ partial class FacturasForm
         // 
         // gbxCrearFactura
         // 
-        gbxCrearFactura.Controls.Add(lblCita);
-        gbxCrearFactura.Controls.Add(cmbCita);
+        gbxCrearFactura.Controls.Add(lblBuscarPropietario);
+        gbxCrearFactura.Controls.Add(txtBuscarPropietario);
+        gbxCrearFactura.Controls.Add(dgvCitas);
         gbxCrearFactura.Controls.Add(btnCrearFactura);
         gbxCrearFactura.Controls.Add(btnRecargarCitas);
         gbxCrearFactura.Font = new Font("Segoe UI", 10F);
@@ -102,38 +106,54 @@ partial class FacturasForm
         gbxCrearFactura.Margin = new Padding(3, 4, 3, 4);
         gbxCrearFactura.Name = "gbxCrearFactura";
         gbxCrearFactura.Padding = new Padding(3, 4, 3, 4);
-        gbxCrearFactura.Size = new Size(1371, 107);
+        gbxCrearFactura.Size = new Size(1371, 300);
         gbxCrearFactura.TabIndex = 0;
         gbxCrearFactura.TabStop = false;
         gbxCrearFactura.Text = "Crear Factura desde Cita";
         // 
-        // lblCita
+        // lblBuscarPropietario
         // 
-        lblCita.AutoSize = true;
-        lblCita.Location = new Point(17, 40);
-        lblCita.Name = "lblCita";
-        lblCita.Size = new Size(44, 23);
-        lblCita.TabIndex = 0;
-        lblCita.Text = "Cita:";
+        lblBuscarPropietario.AutoSize = true;
+        lblBuscarPropietario.Location = new Point(17, 40);
+        lblBuscarPropietario.Name = "lblBuscarPropietario";
+        lblBuscarPropietario.Size = new Size(178, 23);
+        lblBuscarPropietario.TabIndex = 0;
+        lblBuscarPropietario.Text = "Buscar por Propietario:";
         // 
-        // cmbCita
+        // txtBuscarPropietario
         // 
-        cmbCita.DropDownStyle = ComboBoxStyle.DropDownList;
-        cmbCita.FormattingEnabled = true;
-        cmbCita.Location = new Point(69, 36);
-        cmbCita.Margin = new Padding(3, 4, 3, 4);
-        cmbCita.Name = "cmbCita";
-        cmbCita.Size = new Size(571, 31);
-        cmbCita.TabIndex = 1;
+        txtBuscarPropietario.Location = new Point(201, 36);
+        txtBuscarPropietario.Margin = new Padding(3, 4, 3, 4);
+        txtBuscarPropietario.Name = "txtBuscarPropietario";
+        txtBuscarPropietario.Size = new Size(300, 30);
+        txtBuscarPropietario.TabIndex = 1;
+        txtBuscarPropietario.TextChanged += TxtBuscarPropietario_TextChanged;
+        // 
+        // dgvCitas
+        // 
+        dgvCitas.AllowUserToAddRows = false;
+        dgvCitas.AllowUserToDeleteRows = false;
+        dgvCitas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+        dgvCitas.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        dgvCitas.Location = new Point(17, 80);
+        dgvCitas.Margin = new Padding(3, 4, 3, 4);
+        dgvCitas.MultiSelect = false;
+        dgvCitas.Name = "dgvCitas";
+        dgvCitas.ReadOnly = true;
+        dgvCitas.RowHeadersWidth = 51;
+        dgvCitas.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        dgvCitas.Size = new Size(1330, 190);
+        dgvCitas.TabIndex = 2;
+        dgvCitas.SelectionChanged += DgvCitas_SelectionChanged;
         // 
         // btnCrearFactura
         // 
         btnCrearFactura.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-        btnCrearFactura.Location = new Point(663, 33);
+        btnCrearFactura.Location = new Point(520, 33);
         btnCrearFactura.Margin = new Padding(3, 4, 3, 4);
         btnCrearFactura.Name = "btnCrearFactura";
         btnCrearFactura.Size = new Size(229, 40);
-        btnCrearFactura.TabIndex = 2;
+        btnCrearFactura.TabIndex = 3;
         btnCrearFactura.Text = "&Crear Factura";
         btnCrearFactura.UseVisualStyleBackColor = true;
         btnCrearFactura.Click += btnCrearFactura_Click;
@@ -141,11 +161,11 @@ partial class FacturasForm
         // btnRecargarCitas
         // 
         btnRecargarCitas.Font = new Font("Segoe UI", 9F);
-        btnRecargarCitas.Location = new Point(920, 33);
+        btnRecargarCitas.Location = new Point(770, 33);
         btnRecargarCitas.Margin = new Padding(3, 4, 3, 4);
         btnRecargarCitas.Name = "btnRecargarCitas";
         btnRecargarCitas.Size = new Size(120, 40);
-        btnRecargarCitas.TabIndex = 3;
+        btnRecargarCitas.TabIndex = 4;
         btnRecargarCitas.Text = "&Recargar Citas";
         btnRecargarCitas.UseVisualStyleBackColor = true;
         btnRecargarCitas.Click += btnRecargarCitas_Click;
@@ -160,7 +180,7 @@ partial class FacturasForm
         gbxAgregarItem.Controls.Add(lblIDServicioItem);
         gbxAgregarItem.Controls.Add(lblIDFactura);
         gbxAgregarItem.Font = new Font("Segoe UI", 10F);
-        gbxAgregarItem.Location = new Point(14, 147);
+        gbxAgregarItem.Location = new Point(14, 333);
         gbxAgregarItem.Margin = new Padding(3, 4, 3, 4);
         gbxAgregarItem.Name = "gbxAgregarItem";
         gbxAgregarItem.Padding = new Padding(3, 4, 3, 4);
@@ -245,7 +265,7 @@ partial class FacturasForm
         gbxDatosCita.Controls.Add(lblMascota);
         gbxDatosCita.Controls.Add(lblPropietario);
         gbxDatosCita.Font = new Font("Segoe UI", 10F);
-        gbxDatosCita.Location = new Point(720, 147);
+        gbxDatosCita.Location = new Point(720, 333);
         gbxDatosCita.Margin = new Padding(3, 4, 3, 4);
         gbxDatosCita.Name = "gbxDatosCita";
         gbxDatosCita.Padding = new Padding(3, 4, 3, 4);
@@ -360,7 +380,7 @@ partial class FacturasForm
         gbxHistorial.Controls.Add(btnCargarFacturas);
         gbxHistorial.Controls.Add(dgvFacturas);
         gbxHistorial.Font = new Font("Segoe UI", 10F);
-        gbxHistorial.Location = new Point(14, 333);
+        gbxHistorial.Location = new Point(14, 520);
         gbxHistorial.Margin = new Padding(3, 4, 3, 4);
         gbxHistorial.Name = "gbxHistorial";
         gbxHistorial.Padding = new Padding(3, 4, 3, 4);
@@ -402,7 +422,7 @@ partial class FacturasForm
         gbxDetalles.Controls.Add(lblSubtotal);
         gbxDetalles.Controls.Add(dgvDetalles);
         gbxDetalles.Font = new Font("Segoe UI", 10F);
-        gbxDetalles.Location = new Point(720, 333);
+        gbxDetalles.Location = new Point(720, 520);
         gbxDetalles.Margin = new Padding(3, 4, 3, 4);
         gbxDetalles.Name = "gbxDetalles";
         gbxDetalles.Padding = new Padding(3, 4, 3, 4);
@@ -478,6 +498,7 @@ partial class FacturasForm
         Load += FacturasForm_Load;
         gbxCrearFactura.ResumeLayout(false);
         gbxCrearFactura.PerformLayout();
+        ((System.ComponentModel.ISupportInitialize)dgvCitas).EndInit();
         gbxAgregarItem.ResumeLayout(false);
         gbxAgregarItem.PerformLayout();
         gbxDatosCita.ResumeLayout(false);

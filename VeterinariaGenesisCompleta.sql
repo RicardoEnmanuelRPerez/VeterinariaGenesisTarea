@@ -6,7 +6,6 @@ Este script crea la base de datos y todas las tablas necesarias.
 EJECUTAR PRIMERO
 ==================================================================================
 */
-
 -- Crear base de datos
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'VeterinariaGenesisDB')
 BEGIN
@@ -21,7 +20,7 @@ USE VeterinariaGenesisDB;
 GO
 
 -- ==========================================================
--- CREACIÓN DE TABLAS
+-- CREACION DE TABLAS
 -- ==========================================================
 
 -- TABLA: Propietario
@@ -76,11 +75,11 @@ BEGIN
     );
     PRINT 'Tabla [Veterinario] creada.';
     
-    -- Índice único filtrado para correo
+    --Indice Unico filtrado para correo
     CREATE UNIQUE INDEX UQ_Veterinario_Correo_NotNull
     ON Veterinario(Correo)
     WHERE Correo IS NOT NULL;
-    PRINT 'Índice único para correo de veterinario creado.';
+    PRINT 'Indice Unico para correo de veterinario creado.';
 END
 ELSE
     PRINT 'Tabla [Veterinario] ya existe.';
@@ -188,12 +187,12 @@ BEGIN
     );
     PRINT 'Tabla [Pago] creada.';
     
-    -- Restricción única para prevenir pagos duplicados
+    -- RestricciOn Unica para prevenir pagos duplicados
     IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'UQ_Pago_ID_Factura')
     BEGIN
         CREATE UNIQUE NONCLUSTERED INDEX UQ_Pago_ID_Factura
         ON Pago(ID_Factura);
-        PRINT 'Índice único UQ_Pago_ID_Factura creado.';
+        PRINT 'Indice Unico UQ_Pago_ID_Factura creado.';
     END
 END
 ELSE
@@ -330,7 +329,7 @@ ELSE
     PRINT 'Tabla [Cirugia] ya existe.';
 GO
 
--- TABLA: Roles (para usuarios de la aplicación)
+-- TABLA: Roles (para usuarios de la aplicacion)
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Roles]') AND type in (N'U'))
 BEGIN
     CREATE TABLE Roles (
@@ -343,7 +342,7 @@ ELSE
     PRINT 'Tabla [Roles] ya existe.';
 GO
 
--- TABLA: Usuario (para usuarios de la aplicación)
+-- TABLA: Usuario (para usuarios de la aplicacion)
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Usuario]') AND type in (N'U'))
 BEGIN
     CREATE TABLE Usuario (
@@ -366,68 +365,67 @@ GO
 
   /*
 ==================================================================================
-SCRIPT 02: ÍNDICES DE RENDIMIENTO - VeterinariaGenesisDB
+SCRIPT 02: INDICES DE RENDIMIENTO - VeterinariaGenesisDB
 ==================================================================================
-Este script crea los índices para optimizar las consultas.
-EJECUTAR DESPUÉS DE 01_Esquema_Base.sql
+Este script crea los indices para optimizar las consultas.
+EJECUTAR DESPUES DE 01_Esquema_Base.sql
 ==================================================================================
 */
 
 USE VeterinariaGenesisDB;
 GO
 
-PRINT '--- Creando índices de rendimiento ---';
+PRINT '--- Creando ï¿½ndices de rendimiento ---';
 GO
 
--- Índices para Mascota
+-- indices para Mascota
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Mascota_Propietario')
     CREATE INDEX IX_Mascota_Propietario ON Mascota(ID_Propietario);
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Mascota_Nombre')
     CREATE INDEX IX_Mascota_Nombre ON Mascota(Nombre);
 
--- Índices para Cita
+-- indices para Cita
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Cita_Veterinario_Fecha')
     CREATE INDEX IX_Cita_Veterinario_Fecha ON Cita(ID_Veterinario, Fecha);
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Cita_Mascota')
     CREATE INDEX IX_Cita_Mascota ON Cita(ID_Mascota);
 
--- Índices para Tratamiento
+-- indices para Tratamiento
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Tratamiento_Mascota')
     CREATE INDEX IX_Tratamiento_Mascota ON Tratamiento(ID_Mascota);
 
--- Índices para Hospitalizacion
+-- indices para Hospitalizacion
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Hospitalizacion_Mascota')
     CREATE INDEX IX_Hospitalizacion_Mascota ON Hospitalizacion(ID_Mascota);
 
--- Índices para Propietario
+-- indices para Propietario
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Propietario_Apellidos_Nombre')
     CREATE INDEX IX_Propietario_Apellidos_Nombre ON Propietario(Apellidos, Nombre);
 
--- Índices para Factura
+-- indices para Factura
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Factura_Propietario_Estado')
     CREATE INDEX IX_Factura_Propietario_Estado ON Factura(ID_Propietario, EstadoPago);
 
--- Índices para FacturaDetalle
+-- ndices para FacturaDetalle
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_FacturaDetalle_Factura')
     CREATE INDEX IX_FacturaDetalle_Factura ON FacturaDetalle(ID_Factura);
 
--- Índices para Cirugia
+-- indices para Cirugia
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Cirugia_Mascota')
     CREATE INDEX IX_Cirugia_Mascota ON Cirugia(ID_Mascota);
 
--- Índices para Mascota_Vacuna
+-- indices para Mascota_Vacuna
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Mascota_Vacuna_Mascota')
     CREATE INDEX IX_Mascota_Vacuna_Mascota ON Mascota_Vacuna(ID_Mascota);
 
-PRINT '*** ÍNDICES CREADOS EXITOSAMENTE ***';
+PRINT '*** INDICES CREADOS EXITOSAMENTE ***';
 GO
-
 /*
 ==================================================================================
 SCRIPT 03: TRIGGERS - VeterinariaGenesisDB
 ==================================================================================
 Este script crea todos los triggers necesarios.
-EJECUTAR DESPUÉS DE 02_Indices.sql
+EJECUTAR DESPUES DE 02_Indices.sql
 ==================================================================================
 */
 
@@ -497,7 +495,7 @@ GO
 SCRIPT 04: STORED PROCEDURES CRUD PRINCIPALES - VeterinariaGenesisDB
 ==================================================================================
 Este script crea los SPs principales de CRUD (Propietario, Mascota, Cita, Factura).
-EJECUTAR DESPUÉS DE 03_Triggers.sql
+EJECUTAR DESPUES DE 03_Triggers.sql
 ==================================================================================
 */
 
@@ -546,6 +544,17 @@ CREATE PROCEDURE sp_Propietario_Crear
     @Telefono VARCHAR(20) = NULL
 AS
 BEGIN
+    -- Validar si ya existe un propietario activo con el mismo nombre
+    IF EXISTS (
+        SELECT 1 FROM Propietario 
+        WHERE LOWER(LTRIM(RTRIM(Nombre))) = LOWER(LTRIM(RTRIM(@Nombre)))
+          AND Activo = 1
+    )
+    BEGIN
+        RAISERROR('Ya existe un propietario activo con el nombre "%s". No se pueden registrar propietarios con nombres duplicados.', 16, 1, @Nombre);
+        RETURN;
+    END
+
     INSERT INTO Propietario (Nombre, Apellidos, Direccion, Telefono, Activo)
     VALUES (@Nombre, @Apellidos, @Direccion, @Telefono, 1);
     SELECT SCOPE_IDENTITY() AS NuevoID;
@@ -754,8 +763,20 @@ CREATE PROCEDURE sp_Cita_ListarPorFecha
     @Fecha DATE
 AS
 BEGIN
-    SELECT C.*, M.Nombre AS Mascota, V.Nombre AS Veterinario, S.Nombre AS Servicio,
-           P.Nombre + ' ' + P.Apellidos AS Propietario
+    SET NOCOUNT ON;
+    SELECT 
+        C.ID_Cita,
+        C.Fecha,
+        C.Hora,
+        C.Estado,
+        C.ID_Mascota,
+        M.Nombre AS Mascota,
+        M.ID_Propietario AS ID_Propietario,
+        P.Nombre + ' ' + P.Apellidos AS Propietario,
+        C.ID_Veterinario,
+        V.Nombre AS Veterinario,
+        C.ID_Servicio,
+        S.Nombre AS Servicio
     FROM Cita C
     JOIN Mascota M ON C.ID_Mascota = M.ID_Mascota
     JOIN Propietario P ON M.ID_Propietario = P.ID_Propietario
@@ -772,8 +793,20 @@ CREATE PROCEDURE sp_Cita_ListarPorVeterinario
     @ID_Veterinario INT
 AS
 BEGIN
-    SELECT C.*, M.Nombre AS Mascota, V.Nombre AS Veterinario, S.Nombre AS Servicio,
-           P.Nombre + ' ' + P.Apellidos AS Propietario
+    SET NOCOUNT ON;
+    SELECT 
+        C.ID_Cita,
+        C.Fecha,
+        C.Hora,
+        C.Estado,
+        C.ID_Mascota,
+        M.Nombre AS Mascota,
+        M.ID_Propietario AS ID_Propietario,
+        P.Nombre + ' ' + P.Apellidos AS Propietario,
+        C.ID_Veterinario,
+        V.Nombre AS Veterinario,
+        C.ID_Servicio,
+        S.Nombre AS Servicio
     FROM Cita C
     JOIN Mascota M ON C.ID_Mascota = M.ID_Mascota
     JOIN Propietario P ON M.ID_Propietario = P.ID_Propietario
@@ -792,8 +825,19 @@ CREATE PROCEDURE sp_Cita_ListarCompletadasSinFactura
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT C.*, M.Nombre AS Mascota, V.Nombre AS Veterinario, S.Nombre AS Servicio,
-           P.Nombre + ' ' + P.Apellidos AS Propietario
+    SELECT 
+        C.ID_Cita,
+        C.Fecha,
+        C.Hora,
+        C.Estado,
+        C.ID_Mascota,
+        M.Nombre AS Mascota,
+        M.ID_Propietario AS ID_Propietario,
+        P.Nombre + ' ' + P.Apellidos AS Propietario,
+        C.ID_Veterinario,
+        V.Nombre AS Veterinario,
+        C.ID_Servicio,
+        S.Nombre AS Servicio
     FROM Cita C
     JOIN Mascota M ON C.ID_Mascota = M.ID_Mascota
     JOIN Propietario P ON M.ID_Propietario = P.ID_Propietario
@@ -813,7 +857,7 @@ GO
 ==================================================================================
 SCRIPT 05: STORED PROCEDURES DE FACTURAS - VeterinariaGenesisDB
 ==================================================================================
-EJECUTAR DESPUÉS DE 04_StoredProcedures_CRUD.sql
+EJECUTAR DESPUES DE 04_StoredProcedures_CRUD.sql
 ==================================================================================
 */
 
@@ -929,7 +973,7 @@ BEGIN
         IF @EstadoActual != 'Pendiente'
         BEGIN
             ROLLBACK TRANSACTION;
-            SET @MensajeEstado = 'La factura ya fue pagada o está en otro estado. Estado actual: ' + @EstadoActual;
+            SET @MensajeEstado = 'La factura ya fue pagada o estï¿½ en otro estado. Estado actual: ' + @EstadoActual;
             RAISERROR(@MensajeEstado, 16, 1);
             RETURN;
         END
@@ -1055,20 +1099,20 @@ GO
 
 /*
 ==================================================================================
-SCRIPT 06: STORED PROCEDURES DE HISTORIAL CLÍNICO - VeterinariaGenesisDB
+SCRIPT 06: STORED PROCEDURES DE HISTORIAL CLINICO - VeterinariaGenesisDB
 ==================================================================================
-EJECUTAR DESPUÉS DE 05_StoredProcedures_Facturas.sql
+EJECUTAR DESPUES DE 05_StoredProcedures_Facturas.sql
 ==================================================================================
 */
 
 USE VeterinariaGenesisDB;
 GO
 
-PRINT '--- Creando Stored Procedures de Historial Clínico ---';
+PRINT '--- Creando Stored Procedures de Historial Clï¿½nico ---';
 GO
 
 -- ====================================================
--- SP: Obtener Historial Clínico Completo de una Mascota
+-- SP: Obtener Historial Clinico Completo de una Mascota
 -- ====================================================
 IF OBJECT_ID('sp_Historial_ObtenerPorMascota', 'P') IS NOT NULL 
     DROP PROCEDURE sp_Historial_ObtenerPorMascota;
@@ -1113,7 +1157,7 @@ BEGIN
     UNION ALL
     
     SELECT 
-        'Cirugía' AS TipoEvento,
+        'Cirugia' AS TipoEvento,
         CAST(CIR.ID_Cirugia AS VARCHAR(50)) AS ID_Evento,
         CIR.Fecha AS Fecha,
         NULL AS Hora,
@@ -1129,11 +1173,11 @@ BEGIN
     UNION ALL
     
     SELECT 
-        'Hospitalización' AS TipoEvento,
+        'Hospitalizacion' AS TipoEvento,
         CAST(H.ID_Hospitalizacion AS VARCHAR(50)) AS ID_Evento,
         H.FechaIngreso AS Fecha,
         NULL AS Hora,
-        'Hospitalización' AS Descripcion,
+        'Hospitalizacion' AS Descripcion,
         NULL AS Veterinario,
         NULL AS Costo,
         CASE WHEN H.FechaSalida IS NULL THEN 'En Curso' ELSE 'Finalizada' END AS Estado,
@@ -1152,7 +1196,7 @@ BEGIN
         NULL AS Veterinario,
         NULL AS Costo,
         CASE WHEN MV.FechaProximaDosis IS NULL OR MV.FechaProximaDosis > GETDATE() THEN 'Vigente' ELSE 'Vencida' END AS Estado,
-        'Próxima dosis: ' + ISNULL(CONVERT(VARCHAR, MV.FechaProximaDosis, 103), 'N/A') AS Observaciones
+        'Proxima dosis: ' + ISNULL(CONVERT(VARCHAR, MV.FechaProximaDosis, 103), 'N/A') AS Observaciones
     FROM Mascota_Vacuna MV
     INNER JOIN Vacuna VAC ON MV.ID_Vacuna = VAC.ID_Vacuna
     WHERE MV.ID_Mascota = @ID_Mascota
@@ -1232,14 +1276,14 @@ BEGIN
 END
 GO
 
-PRINT '*** STORED PROCEDURES DE HISTORIAL CLÍNICO CREADOS ***';
+PRINT '*** STORED PROCEDURES DE HISTORIAL CLINICO CREADOS ***';
 GO
 
 /*
 ==================================================================================
 SCRIPT 07: STORED PROCEDURES DE DASHBOARD - VeterinariaGenesisDB
 ==================================================================================
-EJECUTAR DESPUÉS DE 06_StoredProcedures_Historial.sql
+EJECUTAR DESPUï¿½S DE 06_StoredProcedures_Historial.sql
 ==================================================================================
 */
 
@@ -1250,7 +1294,7 @@ PRINT '--- Creando Stored Procedures de Dashboard ---';
 GO
 
 -- ====================================================
--- SP: Cirugías por Veterinario
+-- SP: Cirugias por Veterinario
 -- ====================================================
 IF OBJECT_ID('sp_Dashboard_CirugiasPorVeterinario', 'P') IS NOT NULL 
     DROP PROCEDURE sp_Dashboard_CirugiasPorVeterinario;
@@ -1285,7 +1329,7 @@ END
 GO
 
 -- ====================================================
--- SP: Citas por Día de la Semana
+-- SP: Citas por Dia de la Semana
 -- ====================================================
 IF OBJECT_ID('sp_Dashboard_CitasPorDiaSemana', 'P') IS NOT NULL 
     DROP PROCEDURE sp_Dashboard_CitasPorDiaSemana;
@@ -1303,10 +1347,10 @@ BEGIN
             WHEN 1 THEN 'Domingo'
             WHEN 2 THEN 'Lunes'
             WHEN 3 THEN 'Martes'
-            WHEN 4 THEN 'Miércoles'
+            WHEN 4 THEN 'Miircoles'
             WHEN 5 THEN 'Jueves'
             WHEN 6 THEN 'Viernes'
-            WHEN 7 THEN 'Sábado'
+            WHEN 7 THEN 'Sabado'
         END AS DiaSemana,
         COUNT(C.ID_Cita) AS CantidadCitas,
         COUNT(CASE WHEN C.Estado = 'Completada' THEN 1 END) AS CitasCompletadas,
@@ -1373,7 +1417,7 @@ GO
 ==================================================================================
 SCRIPT 08: STORED PROCEDURES DE VACUNAS - VeterinariaGenesisDB
 ==================================================================================
-EJECUTAR DESPUÉS DE 07_StoredProcedures_Dashboard.sql
+EJECUTAR DESPUES DE 07_StoredProcedures_Dashboard.sql
 ==================================================================================
 */
 
@@ -1384,7 +1428,7 @@ PRINT '--- Creando Stored Procedures de Vacunas ---';
 GO
 
 -- ====================================================
--- SP: Recordatorios de Vacunación
+-- SP: Recordatorios de Vacunacion
 -- ====================================================
 IF OBJECT_ID('sp_Vacuna_Recordatorios', 'P') IS NOT NULL 
     DROP PROCEDURE sp_Vacuna_Recordatorios;
@@ -1410,7 +1454,7 @@ BEGIN
         MV.FechaAplicacion,
         MV.FechaProximaDosis,
         CASE 
-            WHEN MV.FechaProximaDosis IS NULL THEN 'Sin próxima dosis programada'
+            WHEN MV.FechaProximaDosis IS NULL THEN 'Sin proxima dosis programada'
             WHEN MV.FechaProximaDosis < GETDATE() THEN 'Vencida'
             WHEN MV.FechaProximaDosis <= DATEADD(DAY, @DiasAnticipacion, GETDATE()) THEN 'Por vencer'
             ELSE 'Vigente'
@@ -1442,7 +1486,7 @@ GO
 ==================================================================================
 SCRIPT 09: STORED PROCEDURES DE REPORTES - VeterinariaGenesisDB
 ==================================================================================
-EJECUTAR DESPUÉS DE 08_StoredProcedures_Vacunas.sql
+EJECUTAR DESPUES DE 08_StoredProcedures_Vacunas.sql
 ==================================================================================
 */
 
@@ -1540,7 +1584,7 @@ END
 GO
 
 -- ====================================================
--- SP: Reporte de Ingresos por Período
+-- SP: Reporte de Ingresos por Periodo
 -- ====================================================
 CREATE OR ALTER PROCEDURE sp_Reporte_IngresosPorPeriodo
     @fechaInicio DATE = NULL,
@@ -1577,7 +1621,7 @@ GO
 ==================================================================================
 SCRIPT 10: STORED PROCEDURES DE SERVICIOS Y VETERINARIOS - VeterinariaGenesisDB
 ==================================================================================
-EJECUTAR DESPUÉS DE 09_StoredProcedures_Reportes.sql
+EJECUTAR DESPUES DE 09_StoredProcedures_Reportes.sql
 ==================================================================================
 */
 
@@ -1685,12 +1729,12 @@ BEGIN
     END
     IF EXISTS (SELECT 1 FROM Cita WHERE ID_Servicio = @ID_Servicio)
     BEGIN
-        RAISERROR('No se puede eliminar el servicio porque está siendo usado en citas.', 16, 1);
+        RAISERROR('No se puede eliminar el servicio porque estï¿½ siendo usado en citas.', 16, 1);
         RETURN;
     END
     IF EXISTS (SELECT 1 FROM FacturaDetalle WHERE ID_Servicio = @ID_Servicio)
     BEGIN
-        RAISERROR('No se puede eliminar el servicio porque está siendo usado en facturas.', 16, 1);
+        RAISERROR('No se puede eliminar el servicio porque estï¿½ siendo usado en facturas.', 16, 1);
         RETURN;
     END
     DELETE FROM Servicio WHERE ID_Servicio = @ID_Servicio;
@@ -1733,7 +1777,7 @@ GO
 ==================================================================================
 SCRIPT 11: VISTAS - VeterinariaGenesisDB
 ==================================================================================
-EJECUTAR DESPUÉS DE 10_StoredProcedures_Servicios.sql
+EJECUTAR DESPUES DE 10_StoredProcedures_Servicios.sql
 ==================================================================================
 */
 
@@ -1808,7 +1852,7 @@ GO
 SCRIPT 12: USUARIOS Y PERMISOS - VeterinariaGenesisDB
 ==================================================================================
 Este script crea el login/usuario de la API y asigna todos los permisos.
-EJECUTAR DESPUÉS DE 11_Vistas.sql
+EJECUTAR DESPUES DE 11_Vistas.sql
 ==================================================================================
 */
 
@@ -1883,13 +1927,14 @@ IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'admin')
     INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, Activo)
     VALUES ('admin', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Administrador del Sistema', @AdminRol, 1);
 
-IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'asolis')
-    INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, ID_Veterinario, Activo)
-    VALUES ('asolis', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Dr. Alejandro Solas', @VetRol, 1, 1);
+-- NOTA: Los usuarios con ID_Veterinario se insertan despuÃ©s de crear los veterinarios 
+-- IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'asolis')
+--     INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, ID_Veterinario, Activo)
+--     VALUES ('asolis', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Dr. Alejandro Solas', @VetRol, 1, 1);
 
-IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'bpena')
-    INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, ID_Veterinario, Activo)
-    VALUES ('bpena', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Dra. Beatriz Pena', @VetRol, 2, 1);
+-- IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'bpena')
+--     INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, ID_Veterinario, Activo)
+--     VALUES ('bpena', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Dra. Beatriz Pena', @VetRol, 2, 1);
 
 IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'r.gomez')
     INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, Activo)
@@ -1900,13 +1945,13 @@ IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'j.perez')
     VALUES ('j.perez', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Javier Perez (Recepcion)', @RecRol, 1);
 GO
 
-PRINT '5 usuarios de ejemplo creados.';
+PRINT '3 usuarios de ejemplo creados (admin, r.gomez, j.perez). Los usuarios veterinarios (asolis, bpena) se crearÃ¡n despuÃ©s de insertar los veterinarios.';
 GO
 
 -- ====================================================
--- OTORGAR PERMISOS DE EJECUCIÓN A TODOS LOS SPs
+-- OTORGAR PERMISOS DE EJECUCION A TODOS LOS SPs
 -- ====================================================
-PRINT '--- Otorgando permisos de ejecución a los SPs ---';
+PRINT '--- Otorgando permisos de ejecuciï¿½n a los SPs ---';
 GO
 
 -- SPs de Usuario
@@ -2058,13 +2103,13 @@ GO
 ==================================================================================
 SCRIPT 13: DATOS DE EJEMPLO - VeterinariaGenesisDB
 ==================================================================================
-Este script inserta todos los datos de ejemplo necesarios para probar la aplicación.
-EJECUTAR ÚLTIMO, DESPUÉS DE 12_Usuarios_Permisos.sql
+Este script inserta todos los datos de ejemplo necesarios para probar la aplicacion.
+EJECUTAR ULTIMO, DESPUES DE 12_Usuarios_Permisos.sql
 
 Contiene:
 - Propietarios, Veterinarios, Servicios, Medicamentos, Vacunas
 - Mascotas, Citas, Facturas, FacturaDetalle, Pagos
-- Tratamientos, Hospitalizaciones, Cirugías, Mascota_Vacuna
+- Tratamientos, Hospitalizaciones, Cirugias, Mascota_Vacuna
 ==================================================================================
 */
 
@@ -2075,30 +2120,30 @@ GO
 -- 1. TABLA: Propietario 
 -- ====================================================
 INSERT INTO Propietario (Nombre, Apellidos, Direccion, Telefono) VALUES
-('Carlos', 'Hernández', 'Residencial Los Robles, A-10', '8881-1001'),
-('Ana', 'Martínez', 'Barrio Monseñor Lezcano, Casa 20', '8881-1002'),
-('Luis', 'García', 'Carretera a Masaya, Km 14', '8881-1003'),
-('María', 'Rodríguez', 'Altamira D''Este, #45', '8881-1004'),
-('Javier', 'López', 'Bello Horizonte, IV Etapa', '8881-1005'),
-('Sofía', 'Pérez', 'Las Colinas, Calle Principal', '8881-1006'),
-('Miguel', 'González', 'Villa Fontana, C-5', '8881-1007'),
-('Lucía', 'Sánchez', 'Reparto San Juan, Casa 80', '8881-1008'),
-('Diego', 'Ramírez', 'Planes de Altamira, #12', '8881-1009'),
+('Carlos', 'Hernandez', 'Residencial Los Robles, A-10', '8881-1001'),
+('Ana', 'Martinez', 'Barrio Monsenor Lezcano, Casa 20', '8881-1002'),
+('Luis', 'Garcia', 'Carretera a Masaya, Km 14', '8881-1003'),
+('Marta', 'Rodriguez', 'Altamira D''Este, #45', '8881-1004'),
+('Javier', 'Lopez', 'Bello Horizonte, IV Etapa', '8881-1005'),
+('Sofia', 'Perez', 'Las Colinas, Calle Principal', '8881-1006'),
+('Miguel', 'Gonzalez', 'Villa Fontana, C-5', '8881-1007'),
+('Lucia', 'Sanchez', 'Reparto San Juan, Casa 80', '8881-1008'),
+('Diego', 'Ramirez', 'Planes de Altamira, #12', '8881-1009'),
 ('Elena', 'Flores', 'Camino de Oriente, Mod C-2', '8881-1010'),
-('Pedro', 'Díaz', 'Masaya, Barrio San Miguel', '8881-1011'),
+('Pedro', 'Diaz', 'Masaya, Barrio San Miguel', '8881-1011'),
 ('Laura', 'Torres', 'Granada, Calle La Calzada', '8881-1012'),
-('Sergio', 'Morales', 'León, Reparto Fátima', '8881-1013'),
+('Sergio', 'Morales', 'Leon, Reparto Fatima', '8881-1013'),
 ('Valeria', 'Cruz', 'Santo Domingo, Km 10', '8881-1014'),
-('Andrés', 'Ortiz', 'Esquipulas, Km 11.5', '8881-1015'),
-('Gabriela', 'Reyes', 'Ticuantepe, Lotificación 30', '8881-1016'),
-('Fernando', 'Jiménez', 'Veracruz, Condominio 4', '8881-1017'),
-('Paula', 'Moreno', 'Nindirí, Km 20', '8881-1018'),
+('Andres', 'Ortiz', 'Esquipulas, Km 11.5', '8881-1015'),
+('Gabriela', 'Reyes', 'Ticuantepe, Lotificacion 30', '8881-1016'),
+('Fernando', 'Jimenez', 'Veracruz, Condominio 4', '8881-1017'),
+('Paula', 'Moreno', 'Nindiri, Km 20', '8881-1018'),
 ('Ricardo', 'Alonso', 'Reparto Tiscapa, #5', '8881-1019'),
-('Camila', 'Gutiérrez', 'Bolonia, Hotel Mansión Teodolinda 2c. al Sur', '8881-1020'),
+('Camila', 'Gutierrez', 'Bolonia, Hotel Mansion Teodolinda 2c. al Sur', '8881-1020'),
 ('Mateo', 'Silva', 'Catarina, Mirador', '8881-1021'),
 ('Isabela', 'Mendoza', 'Jinotepe, Carazo', '8881-1022'),
 ('Daniel', 'Castillo', 'Rivas, San Juan del Sur', '8881-1023'),
-('Alejandra', 'Navarro', 'Estelí, Barrio Nuevo', '8881-1024'),
+('Alejandra', 'Navarro', 'Esteli, Barrio Nuevo', '8881-1024'),
 ('Jorge', 'Castro', 'Matagalpa, Centro', '8881-1025'),
 ('Carmen', 'Ruiz', 'Chinandega, Reparto Los Maderos', '8881-1026'),
 ('Roberto', 'Vargas', 'Pochomil, Casa 15', '8881-1027'),
@@ -2111,79 +2156,122 @@ GO
 -- 2. TABLA: Veterinario 
 -- ====================================================
 INSERT INTO Veterinario (Nombre, Especialidad) VALUES
-('Dr. Alejandro Solís', 'Cirugía General'),
-('Dra. Beatriz Peña', 'Medicina Interna'),
-('Dr. Miguel Cifuentes', 'Dermatología'),
-('Dra. Laura Campos', 'Animales Exóticos'),
+('Dr. Alejandro Solis', 'Cirugia General'),
+('Dra. Beatriz Pea', 'Medicina Interna'),
+('Dr. Miguel Cifuentes', 'Dermatologia'),
+('Dra. Laura Campos', 'Animales Exoticos'),
 ('Dr. Roberto Cruz', 'Consulta General'),
-('Dra. Sandra Guido', 'Cardiología'),
-('Dr. Esteban Lacayo', 'Neurología'),
-('Dra. Fabiola Téllez', 'Oncología'),
-('Dr. Norman Gaitán', 'Fisioterapia'),
-('Dra. Rebeca Argüello', 'Medicina Felina'),
+('Dra. Sandra Guido', 'Cardiologia'),
+('Dr. Esteban Lacayo', 'Neurologia'),
+('Dra. Fabiola Tellez', 'Oncologia'),
+('Dr. Norman Gaitan', 'Fisioterapia'),
+('Dra. Rebeca Arguello', 'Medicina Felina'),
 ('Dr. Arturo Casco', 'Ortopedia'),
 ('Dra. Melissa Baltodano', 'Consulta General'),
-('Dr. Enrique Fonseca', 'Oftalmología'),
-('Dra. Victoria Ponce', 'Odontología Veterinaria'),
-('Dr. Julio Bendaña', 'Cirugía Ortopédica'),
+('Dr. Enrique Fonseca', 'Oftalmologia'),
+('Dra. Victoria Ponce', 'Odontologia Veterinaria'),
+('Dr. Julio Bendala', 'Cirugia Ortopedica'),
 ('Dra. Karen Mendieta', 'Medicina Preventiva'),
 ('Dr. Oscar Valle', 'Consulta General'),
-('Dra. Claudia Paguaga', 'Endocrinología'),
-('Dr. Luis Felipe Román', 'Anestesiología'),
-('Dra. Ana Cecilia Gallo', 'Laboratorio Clínico'),
-('Dr. Marlon Estrada', 'Cirugía General'),
-('Dra. Gabriela Solórzano', 'Medicina Interna'),
-('Dr. Ariel Dávila', 'Dermatología'),
-('Dra. Patricia Ocampo', 'Animales Exóticos'),
-('Dr. Félix Rivas', 'Consulta General'),
-('Dra. Marcela Sevilla', 'Cardiología'),
-('Dr. Xavier Torres', 'Neurología'),
-('Dra. Ingrid Zamora', 'Oncología'),
-('Dr. Guillermo Terán', 'Fisioterapia'),
+('Dra. Claudia Paguaga', 'Endocrinologia'),
+('Dr. Luis Felipe Romon', 'Anestesiologia'),
+('Dra. Ana Cecilia Gallo', 'Laboratorio Clinico'),
+('Dr. Marlon Estrada', 'Cirugia General'),
+('Dra. Gabriela Solarzano', 'Medicina Interna'),
+('Dr. Ariel Davila', 'Dermatologia'),
+('Dra. Patricia Ocampo', 'Animales Exoticos'),
+('Dr. Felix Rivas', 'Consulta General'),
+('Dra. Marcela Sevilla', 'Cardiologia'),
+('Dr. Xavier Torres', 'Neurologia'),
+('Dra. Ingrid Zamora', 'Oncologia'),
+('Dr. Guillermo Teron', 'Fisioterapia'),
 ('Dra. Carolina Ortega', 'Medicina Felina');
+GO
+
+-- ====================================================
+-- INSERTAR ROLES Y USUARIOS DE EJEMPLO
+-- ====================================================
+PRINT '--- Insertando Roles y Usuarios de Ejemplo ---';
+GO
+
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE NombreRol = 'Administrador')
+    INSERT INTO Roles (NombreRol) VALUES ('Administrador');
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE NombreRol = 'Veterinario')
+    INSERT INTO Roles (NombreRol) VALUES ('Veterinario');
+IF NOT EXISTS (SELECT 1 FROM Roles WHERE NombreRol = 'Recepcionista')
+    INSERT INTO Roles (NombreRol) VALUES ('Recepcionista');
+GO
+
+DECLARE @AdminRol INT = (SELECT ID_Rol FROM Roles WHERE NombreRol = 'Administrador');
+DECLARE @VetRol INT = (SELECT ID_Rol FROM Roles WHERE NombreRol = 'Veterinario');
+DECLARE @RecRol INT = (SELECT ID_Rol FROM Roles WHERE NombreRol = 'Recepcionista');
+
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'admin')
+    INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, Activo)
+    VALUES ('admin', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Administrador del Sistema', @AdminRol, 1);
+
+-- Ahora que los veterinarios estÃ¡n insertados, podemos crear los usuarios que los referencian
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'asolis')
+    INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, ID_Veterinario, Activo)
+    VALUES ('asolis', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Dr. Alejandro Solas', @VetRol, 1, 1);
+
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'bpena')
+    INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, ID_Veterinario, Activo)
+    VALUES ('bpena', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Dra. Beatriz Pena', @VetRol, 2, 1);
+
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'r.gomez')
+    INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, Activo)
+    VALUES ('r.gomez', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Raquel Gomez (Recepcion)', @RecRol, 1);
+
+IF NOT EXISTS (SELECT 1 FROM Usuario WHERE NombreLogin = 'j.perez')
+    INSERT INTO Usuario (NombreLogin, ContrasenaHash, NombreCompleto, ID_Rol, Activo)
+    VALUES ('j.perez', HASHBYTES('SHA2_256', 'P@ssw0rd123'), 'Javier Perez (Recepcion)', @RecRol, 1);
+GO
+
+PRINT '5 usuarios de ejemplo creados.';
 GO
 
 -- ====================================================
 -- 3. TABLA: Servicio 
 -- ====================================================
 INSERT INTO Servicio (Nombre, Descripcion, Costo) VALUES
-('Consulta General', 'Revisión estándar de salud', 35.00),
-('Consulta Especializada', 'Consulta con especialista (Cardiología, Dermatología, etc.)', 50.00),
-('Vacuna Rabia', 'Dosis anual antirrábica', 20.00),
-('Vacuna Múltiple (Perro)', 'Refuerzo anual Parvo, Moquillo, Hepatitis, Lepto', 30.00),
+('Consulta General', 'Revision estandar de salud', 35.00),
+('Consulta Especializada', 'Consulta con especialista (Cardiologia, Dermatologia, etc.)', 50.00),
+('Vacuna Rabia', 'Dosis anual antirrabica', 20.00),
+('Vacuna Multiple (Perro)', 'Refuerzo anual Parvo, Moquillo, Hepatitis, Lepto', 30.00),
 ('Vacuna Triple (Gato)', 'Refuerzo anual Rino, Calici, Panleuco', 28.00),
-('Desparasitación Interna (Perro)', 'Pastilla según peso (precio base)', 15.00),
-('Desparasitación Interna (Gato)', 'Pastilla o pipeta (precio base)', 12.00),
-('Aplicación Pipeta (Pulgas/Garrapatas)', 'Producto antiparasitario externo (base)', 18.00),
-('Examen Heces (Coprológico)', 'Análisis de parásitos en heces', 22.00),
-('Hemograma Completo', 'Análisis de sangre completo', 40.00),
-('Química Sanguínea (Panel Básico)', 'Revisión de función renal y hepática', 38.00),
-('Urianálisis', 'Análisis físico-químico de orina', 25.00),
-('Radiografía (Dos Placas)', 'Estudio radiográfico estándar', 55.00),
-('Ultrasonido Abdominal', 'Ecografía de órganos internos', 60.00),
-('Ecocardiograma', 'Ultrasonido especializado del corazón', 85.00),
-('Hospitalización (Día)', 'Cuidado intensivo, monitoreo y fluidoterapia (base)', 80.00),
-('Hospitalización (Medio Día)', 'Monitoreo y tratamiento (menos de 12h)', 45.00),
-('Cirugía Esterilización (Gato)', 'Ovariohisterectomía felina', 80.00),
-('Cirugía Esterilización (Gata)', 'Ovariohisterectomía felina', 95.00),
-('Cirugía Esterilización (Perro Macho)', 'Orquiectomía canina (precio base)', 120.00),
-('Cirugía Esterilización (Perra)', 'Ovariohisterectomía canina (precio base)', 150.00),
-('Cirugía Menor (Suturas)', 'Cierre de heridas simples (base)', 65.00),
+('Desparasitacion Interna (Perro)', 'Pastilla segun peso (precio base)', 15.00),
+('Desparasitacion Interna (Gato)', 'Pastilla o pipeta (precio base)', 12.00),
+('Aplicacion Pipeta (Pulgas/Garrapatas)', 'Producto antiparasitario externo (base)', 18.00),
+('Examen Heces (Coprologico)', 'Analisis de parasitos en heces', 22.00),
+('Hemograma Completo', 'Analisis de sangre completo', 40.00),
+('Quimica Sanguinea (Panel Basico)', 'Revision de funcion renal y hepatica', 38.00),
+('Urianalisis', 'Analisis fisico-quimico de orina', 25.00),
+('Radiografia (Dos Placas)', 'Estudio radiografico estandar', 55.00),
+('Ultrasonido Abdominal', 'Ecografia de organos internos', 60.00),
+('Ecocardiograma', 'Ultrasonido especializado del corazon', 85.00),
+('Hospitalizacion (Dia)', 'Cuidado intensivo, monitoreo y fluidoterapia (base)', 80.00),
+('Hospitalizacion (Medio Dia)', 'Monitoreo y tratamiento (menos de 12h)', 45.00),
+('Cirugia Esterilizacion (Gato)', 'Ovariohisterectomia felina', 80.00),
+('Cirugia Esterilizacion (Gata)', 'Ovariohisterectomia felina', 95.00),
+('Cirugia Esterilizacion (Perro Macho)', 'Orquiectomia canina (precio base)', 120.00),
+('Cirugia Esterilizacion (Perra)', 'Ovariohisterectomia canina (precio base)', 150.00),
+('Cirugia Menor (Suturas)', 'Cierre de heridas simples (base)', 65.00),
 ('Limpieza Dental (Profilaxis)', 'Limpieza con ultrasonido (sin extracciones)', 110.00),
-('Extracción Dental Simple', 'Extracción de pieza dental (por pieza)', 30.00),
-('Toma de Presión Arterial', 'Medición de presión en consulta', 15.00),
-('Microchip (Implantación)', 'Implantación y registro de microchip', 40.00),
-('Certificado de Salud (Viaje)', 'Emisión de certificado para viaje nacional', 25.00),
-('Baño Medicado (Pequeño)', 'Baño terapéutico dermatológico', 20.00),
-('Corte de Pelo (Grooming Básico)', 'Corte higiénico y baño (base)', 30.00),
-('Eutanasia', 'Procedimiento humanitario (incluye sedación)', 60.00);
+('Extraccion Dental Simple', 'Extraccion de pieza dental (por pieza)', 30.00),
+('Toma de Presion Arterial', 'Medicion de presion en consulta', 15.00),
+('Microchip (Implantacion)', 'Implantacion y registro de microchip', 40.00),
+('Certificado de Salud (Viaje)', 'Emision de certificado para viaje nacional', 25.00),
+('Bano Medicado (Pequeno)', 'Bano terapeutico dermatologico', 20.00),
+('Corte de Pelo (Grooming Basico)', 'Corte higienico y bano (base)', 30.00),
+('Eutanasia', 'Procedimiento humanitario (incluye sedacion)', 60.00);
 GO
 
 -- ====================================================
 -- 4. TABLA: Medicamento (CORREGIDO: sin Dosis)
 -- ====================================================
 INSERT INTO Medicamento (Nombre) VALUES
-('Amoxicilina + Ac. Clavulánico'),
+('Amoxicilina + Ac. Clavulinico'),
 ('Prednisona'),
 ('Meloxicam (Perro)'),
 ('Meloxicam (Gato)'),
@@ -2197,7 +2285,7 @@ INSERT INTO Medicamento (Nombre) VALUES
 ('Cefalexina'),
 ('Omeprazol'),
 ('Sucralfato'),
-('Ondansetrón (Inyectable)'),
+('Ondansetron (Inyectable)'),
 ('Maropitant (Cerenia)'),
 ('Ivermectina'),
 ('Selamectina (Revolution)'),
@@ -2207,7 +2295,7 @@ INSERT INTO Medicamento (Nombre) VALUES
 ('Diazepam'),
 ('Propofol'),
 ('Isoflurano'),
-('Clorhexidina (Solución)'),
+('Clorhexidina (Solucion)'),
 ('Yodo Povidona'),
 ('Suero Ringer Lactato'),
 ('Suero Salino 0.9%'),
@@ -2221,12 +2309,12 @@ GO
 INSERT INTO Vacuna (Nombre, Dosis) VALUES
 ('Rabia (Anual) - Lote R100A', '1ml'),
 ('Rabia (Anual) - Lote R100B', '1ml'),
-('Rabia (Refuerzo 3 años) - Lote R301A', '1ml'),
-('Múltiple Canina (Cachorro 1) - Lote MC101', '1ml'),
-('Múltiple Canina (Cachorro 2) - Lote MC102', '1ml'),
-('Múltiple Canina (Cachorro 3) - Lote MC103', '1ml'),
-('Múltiple Canina (Refuerzo Anual) - Lote MCA10', '1ml'),
-('Múltiple Canina + Lepto (Anual) - Lote MCL20', '1ml'),
+('Rabia (Refuerzo 3 anos) - Lote R301A', '1ml'),
+('Multiple Canina (Cachorro 1) - Lote MC101', '1ml'),
+('Multiple Canina (Cachorro 2) - Lote MC102', '1ml'),
+('Multiple Canina (Cachorro 3) - Lote MC103', '1ml'),
+('Multiple Canina (Refuerzo Anual) - Lote MCA10', '1ml'),
+('Multiple Canina + Lepto (Anual) - Lote MCL20', '1ml'),
 ('KC (Bordetella Oral) - Lote KCO30', '0.5ml'),
 ('KC (Bordetella Inyectable) - Lote KCI31', '1ml'),
 ('Triple Felina (Gatito 1) - Lote TF01', '1ml'),
@@ -2239,16 +2327,16 @@ INSERT INTO Vacuna (Nombre, Dosis) VALUES
 ('PIF (Peritonitis Infecciosa Felina) - Lote PIF02', '0.5ml'),
 ('Giardia (Preventiva Canina) - Lote GIA10', '1ml'),
 ('Leptospira (Refuerzo semestral) - Lote LEP50', '1ml'),
-('Múltiple Canina (Puppy DP) - Lote DP01', '1ml'),
+('Multiple Canina (Puppy DP) - Lote DP01', '1ml'),
 ('Rabia (Anual) - Lote R100C', '1ml'),
-('Múltiple Canina (Refuerzo Anual) - Lote MCA11', '1ml'),
+('Multiple Canina (Refuerzo Anual) - Lote MCA11', '1ml'),
 ('Triple Felina (Refuerzo Anual) - Lote TFA2', '1ml'),
 ('Leucemia Felina (Refuerzo Anual) - Lote LFA3', '0.5ml'),
 ('KC (Bordetella Oral) - Lote KCO31', '0.5ml'),
 ('Rabia (Anual) - Lote R100D', '1ml'),
-('Múltiple Canina + Lepto (Anual) - Lote MCL21', '1ml'),
+('Multiple Canina + Lepto (Anual) - Lote MCL21', '1ml'),
 ('Triple Felina (Gatito 1) - Lote TF03', '1ml'),
-('Múltiple Canina (Cachorro 1) - Lote MC104', '1ml');
+('Multiple Canina (Cachorro 1) - Lote MC104', '1ml');
 GO
 
 -- ====================================================
@@ -2256,21 +2344,21 @@ GO
 -- ====================================================
 INSERT INTO Mascota (Nombre, Especie, Raza, Edad, Sexo, ID_Propietario) VALUES
 ('Max', 'Perro', 'Labrador', 5, 'Macho', 1),
-('Luna', 'Gato', 'Siamés', 3, 'Hembra', 2),
-('Rocky', 'Perro', 'Pastor Alemán', 7, 'Macho', 1),
+('Luna', 'Gato', 'Siames', 3, 'Hembra', 2),
+('Rocky', 'Perro', 'Pastor Aleman', 7, 'Macho', 1),
 ('Nala', 'Gato', 'Mestizo', 2, 'Hembra', 3),
-('Coco', 'Perro', 'Bulldog Francés', 4, 'Macho', 4),
+('Coco', 'Perro', 'Bulldog Frances', 4, 'Macho', 4),
 ('Simba', 'Gato', 'Persa', 6, 'Macho', 5),
 ('Lola', 'Perro', 'Pug', 1, 'Hembra', 6),
 ('Thor', 'Perro', 'Rottweiler', 3, 'Macho', 7),
-('Mía', 'Gato', 'Angora', 8, 'Hembra', 8),
+('Mia', 'Gato', 'Angora', 8, 'Hembra', 8),
 ('Toby', 'Perro', 'Golden Retriever', 0, 'Macho', 9),
 ('Kiwi', 'Ave', 'Perico Australiano', 2, 'Macho', 10),
 ('Bella', 'Perro', 'Chihuahua', 10, 'Hembra', 11),
 ('Zeus', 'Perro', 'Husky Siberiano', 4, 'Macho', 12),
 ('Frida', 'Gato', 'Mestizo', 5, 'Hembra', 13),
 ('Bruno', 'Perro', 'Boxer', 6, 'Macho', 14),
-('Oreo', 'Gato', 'Doméstico Pelo Corto', 2, 'Macho', 15),
+('Oreo', 'Gato', 'Domestico Pelo Corto', 2, 'Macho', 15),
 ('Daisy', 'Perro', 'Beagle', 3, 'Hembra', 16),
 ('Milo', 'Perro', 'Shih Tzu', 1, 'Macho', 17),
 ('Cleo', 'Gato', 'Sphynx', 4, 'Hembra', 18),
@@ -2278,8 +2366,8 @@ INSERT INTO Mascota (Nombre, Especie, Raza, Edad, Sexo, ID_Propietario) VALUES
 ('Jack', 'Perro', 'Jack Russell', 9, 'Macho', 20),
 ('Shadow', 'Gato', 'Maine Coon', 5, 'Macho', 21),
 ('Molly', 'Perro', 'Cocker Spaniel', 7, 'Hembra', 22),
-('Apolo', 'Perro', 'Gran Danés', 3, 'Macho', 23),
-('Pelusa', 'Conejo', 'Cabeza de León', 1, 'Hembra', 24),
+('Apolo', 'Perro', 'Gran Danes', 3, 'Macho', 23),
+('Pelusa', 'Conejo', 'Cabeza de Leon', 1, 'Hembra', 24),
 ('Pipo', 'Perro', 'Mestizo', 8, 'Macho', 25),
 ('Nina', 'Gato', 'Ragdoll', 2, 'Hembra', 26),
 ('Chispa', 'Perro', 'Caniche (Toy)', 4, 'Hembra', 27),
@@ -2287,28 +2375,28 @@ INSERT INTO Mascota (Nombre, Especie, Raza, Edad, Sexo, ID_Propietario) VALUES
 ('Misha', 'Gato', 'Azul Ruso', 3, 'Hembra', 29),
 ('Hachi', 'Perro', 'Akita', 5, 'Macho', 30),
 ('Pancha', 'Tortuga', 'De Orejas Rojas', 15, 'Hembra', 10),
-('Copito', 'Hámster', 'Sirio', 1, 'Macho', 15),
-('Felix', 'Gato', 'Doméstico Pelo Corto', 1, 'Macho', 2),
+('Copito', 'Hamster', 'Sirio', 1, 'Macho', 15),
+('Felix', 'Gato', 'Domestico Pelo Corto', 1, 'Macho', 2),
 ('Sasha', 'Perro', 'Pastor Belga', 2, 'Hembra', 7);
 GO
 
--- NOTA: La tabla HistoriaClinica no existe en el esquema, se omite esta sección
+-- NOTA: La tabla HistoriaClinica no existe en el esquema, se omite esta seccion
 -- ====================================================
 -- 7. TABLA: Cita
 -- ====================================================
 INSERT INTO Cita (Fecha, Hora, ID_Mascota, ID_Veterinario, ID_Servicio) VALUES
 -- Citas de Consulta General (ID_Servicio = 1)
 ('2024-01-05', '10:00:00', 1, 5, 1),   -- Max (Labrador) con Dr. Roberto Cruz
-('2024-01-05', '10:30:00', 2, 10, 1),  -- Luna (Siamés) con Dra. Rebeca Argüello (Medicina Felina)
+('2024-01-05', '10:30:00', 2, 10, 1),  -- Luna (Siames) con Dra. Rebeca Arguello (Medicina Felina)
 ('2024-01-05', '11:00:00', 4, 10, 1),  -- Nala (Gato)
-('2024-01-06', '09:00:00', 5, 5, 1),   -- Coco (Bulldog Francés)
+('2024-01-06', '09:00:00', 5, 5, 1),   -- Coco (Bulldog Frances)
 ('2024-01-06', '09:30:00', 7, 12, 1),  -- Lola (Pug) con Dra. Melissa Baltodano
 ('2024-01-06', '10:00:00', 8, 5, 1),   -- Thor (Rottweiler)
 ('2024-01-07', '14:00:00', 12, 17, 1), -- Bella (Chihuahua) con Dr. Oscar Valle
-('2024-01-07', '15:00:00', 16, 25, 1), -- Oreo (Gato) con Dr. Félix Rivas
-('2024-01-08', '11:30:00', 21, 2, 1),  -- Jack (Jack Russell) con Dra. Beatriz Peña
+('2024-01-07', '15:00:00', 16, 25, 1), -- Oreo (Gato) con Dr. Felix Rivas
+('2024-01-08', '11:30:00', 21, 2, 1),  -- Jack (Jack Russell) con Dra. Beatriz Pena
 ('2024-01-08', '12:00:00', 25, 25, 1), -- Pelusa (Conejo)
--- Citas de Vacunación (ID_Servicio: 3 (Rabia), 4 (Múltiple Canina), 5 (Triple Felina))
+-- Citas de Vacunacion (ID_Servicio: 3 (Rabia), 4 (Multiple Canina), 5 (Triple Felina))
 ('2024-01-10', '08:00:00', 1, 16, 4),  -- Max (Labrador) con Dra. Karen Mendieta (Preventiva)
 ('2024-01-10', '08:30:00', 2, 16, 5),  -- Luna (Gato)
 ('2024-01-10', '09:00:00', 10, 16, 4), -- Toby (Golden Retriever)
@@ -2316,15 +2404,15 @@ INSERT INTO Cita (Fecha, Hora, ID_Mascota, ID_Veterinario, ID_Servicio) VALUES
 ('2024-01-11', '16:30:00', 18, 16, 5), -- Cleo (Gato)
 ('2024-01-12', '10:00:00', 22, 16, 3), -- Shadow (Maine Coon)
 ('2024-01-12', '10:30:00', 27, 16, 5), -- Nina (Ragdoll)
-('2024-01-12', '11:00:00', 33, 16, 3), -- Copito (Hamster) - Vacunación atípica o desparasitación
--- Citas Especializadas (ID_Servicio: 2 (Especializada), 13 (Radiografía), 14 (Ultrasonido))
-('2024-01-15', '14:00:00', 3, 2, 2),   -- Rocky (Pastor Alemán) con Dra. Beatriz Peña (Medicina Interna)
-('2024-01-15', '14:30:00', 5, 3, 2),   -- Coco (Bulldog Francés) con Dr. Miguel Cifuentes (Dermatología)
-('2024-01-16', '10:00:00', 8, 6, 15),  -- Thor (Rottweiler) con Dra. Sandra Guido (Cardiología) - Ecocardiograma
-('2024-01-16', '11:00:00', 13, 7, 2),  -- Zeus (Husky) con Dr. Esteban Lacayo (Neurología)
-('2024-01-17', '15:00:00', 19, 13, 2), -- Leo (Doberman) con Dr. Enrique Fonseca (Oftalmología)
-('2024-01-17', '16:00:00', 29, 23, 2), -- Buddy (Mestizo) con Dr. Ariel Dávila (Dermatología)
-('2024-01-18', '09:00:00', 35, 1, 13), -- Sasha (Pastor Belga) con Dr. Alejandro Solís (Cirugía) - Pre-quirúrgica
+('2024-01-12', '11:00:00', 33, 16, 3), -- Copito (Hamster) - Vacunacion atopica o desparasitacion
+-- Citas Especializadas (ID_Servicio: 2 (Especializada), 13 (Radiografia), 14 (Ultrasonido))
+('2024-01-15', '14:00:00', 3, 2, 2),   -- Rocky (Pastor Aleman) con Dra. Beatriz Pena (Medicina Interna)
+('2024-01-15', '14:30:00', 5, 3, 2),   -- Coco (Bulldog Francis) con Dr. Miguel Cifuentes (Dermatoloia)
+('2024-01-16', '10:00:00', 8, 6, 15),  -- Thor (Rottweiler) con Dra. Sandra Guido (Cardiologia) - Ecocardiograma
+('2024-01-16', '11:00:00', 13, 7, 2),  -- Zeus (Husky) con Dr. Esteban Lacayo (Neurologia)
+('2024-01-17', '15:00:00', 19, 13, 2), -- Leo (Doberman) con Dr. Enrique Fonseca (Oftalmologia)
+('2024-01-17', '16:00:00', 29, 23, 2), -- Buddy (Mestizo) con Dr. Ariel Davila (Dermatologia)
+('2024-01-18', '09:00:00', 35, 1, 13), -- Sasha (Pastor Belga) con Dr. Alejandro Solis (Cirugia) - Pre-quirurgica
 -- Citas de Control (ID_Servicio: 1 (Consulta), 9 (Heces), 10 (Hemograma))
 ('2024-01-20', '10:00:00', 1, 5, 10),
 ('2024-01-20', '10:30:00', 2, 10, 9),
@@ -2332,7 +2420,7 @@ INSERT INTO Cita (Fecha, Hora, ID_Mascota, ID_Veterinario, ID_Servicio) VALUES
 ('2024-01-21', '09:30:00', 6, 17, 1),
 ('2024-01-22', '14:00:00', 9, 5, 10),
 ('2024-01-22', '14:30:00', 15, 25, 9),
--- Más Citas Generales y de Vacunación para superar 100
+-- Mas Citas Generales y de Vacunacion para superar 100
 ('2024-01-25', '10:00:00', 3, 5, 4),
 ('2024-01-25', '10:30:00', 4, 10, 5),
 ('2024-01-26', '09:00:00', 5, 5, 1),
@@ -2366,13 +2454,13 @@ INSERT INTO Cita (Fecha, Hora, ID_Mascota, ID_Veterinario, ID_Servicio) VALUES
 ('2024-02-09', '10:00:00', 33, 12, 1),
 ('2024-02-09', '10:30:00', 34, 10, 5),
 ('2024-02-10', '11:00:00', 35, 5, 1),
--- Más Citas Especializadas, Limpieza Dental (23), Desparasitación (6, 7)
-('2024-02-12', '15:00:00', 5, 14, 23), -- Coco (Bulldog Francés) - Limpieza Dental con Dra. Victoria Ponce
-('2024-02-12', '16:00:00', 19, 15, 2), -- Leo (Doberman) - Ortopedia con Dr. Julio Bendaña
-('2024-02-13', '10:00:00', 23, 21, 2), -- Apolo (Gran Danés) - Cirugía con Dr. Marlon Estrada (Pre-op)
-('2024-02-13', '11:00:00', 3, 22, 2),  -- Rocky (Pastor Alemán) - Interna con Dra. Gabriela Solórzano
-('2024-02-14', '08:00:00', 1, 16, 6),  -- Max - Desparasitación Perro
-('2024-02-14', '08:30:00', 2, 16, 7),  -- Luna - Desparasitación Gato
+-- Mas Citas Especializadas, Limpieza Dental (23), Desparasitacion (6, 7)
+('2024-02-12', '15:00:00', 5, 14, 23), -- Coco (Bulldog Frances) - Limpieza Dental con Dra. Victoria Ponce
+('2024-02-12', '16:00:00', 19, 15, 2), -- Leo (Doberman) - Ortopedia con Dr. Julio Bendana
+('2024-02-13', '10:00:00', 23, 21, 2), -- Apolo (Gran Danes) - Cirugia con Dr. Marlon Estrada (Pre-op)
+('2024-02-13', '11:00:00', 3, 22, 2),  -- Rocky (Pastor Aleman) - Interna con Dra. Gabriela Solarzano
+('2024-02-14', '08:00:00', 1, 16, 6),  -- Max - Desparasitacion Perro
+('2024-02-14', '08:30:00', 2, 16, 7),  -- Luna - Desparasitacion Gato
 ('2024-02-14', '09:00:00', 3, 16, 6),
 ('2024-02-15', '14:00:00', 4, 16, 7),
 ('2024-02-15', '14:30:00', 5, 16, 6),
@@ -2405,7 +2493,7 @@ INSERT INTO Cita (Fecha, Hora, ID_Mascota, ID_Veterinario, ID_Servicio) VALUES
 ('2024-02-29', '11:00:00', 33, 16, 1),
 ('2024-02-29', '11:30:00', 34, 16, 7),
 ('2024-03-01', '14:00:00', 35, 16, 6),
--- Más Citas de chequeo general
+-- Mas Citas de chequeo general
 ('2024-03-02', '10:00:00', 1, 5, 1),
 ('2024-03-02', '10:30:00', 2, 10, 1),
 ('2024-03-03', '09:00:00', 3, 5, 1),
@@ -2441,7 +2529,7 @@ INSERT INTO Cita (Fecha, Hora, ID_Mascota, ID_Veterinario, ID_Servicio) VALUES
 ('2024-03-18', '11:00:00', 33, 2, 1),
 ('2024-03-18', '11:30:00', 34, 10, 1),
 ('2024-03-19', '14:00:00', 35, 5, 1),
--- Más citas para desparasitación
+-- Mas citas para desparasitacion
 ('2024-03-20', '08:00:00', 1, 16, 6),
 ('2024-03-20', '08:30:00', 2, 16, 7),
 ('2024-03-20', '09:00:00', 3, 16, 6),
@@ -2494,9 +2582,9 @@ INSERT INTO Factura (Fecha, Total, ID_Propietario, ID_Cita, EstadoPago) VALUES
 ('2024-01-07', 35.00, 15, 15, 'Pagada'),  -- Oreo, Consulta General
 ('2024-01-08', 35.00, 20, 20, 'Pagada'),  -- Jack, Consulta General
 ('2024-01-08', 35.00, 24, 25, 'Pagada'), -- Pelusa, Consulta General
-('2024-01-10', 30.00, 1, 1, 'Pagada'),  -- Max, Vacuna Múltiple
+('2024-01-10', 30.00, 1, 1, 'Pagada'),  -- Max, Vacuna Multiple
 ('2024-01-10', 28.00, 2, 2, 'Pagada'),  -- Luna, Triple Felina
-('2024-01-10', 30.00, 9, 9, 'Pagada'),  -- Toby, Vacuna Múltiple
+('2024-01-10', 30.00, 9, 9, 'Pagada'),  -- Toby, Vacuna Multiple
 ('2024-01-11', 28.00, 13, 13, 'Pagada'), -- Frida, Triple Felina
 ('2024-01-11', 28.00, 18, 18, 'Pagada'), -- Cleo, Triple Felina
 ('2024-01-12', 20.00, 21, 21, 'Pagada'), -- Shadow, Vacuna Rabia
@@ -2508,7 +2596,7 @@ INSERT INTO Factura (Fecha, Total, ID_Propietario, ID_Cita, EstadoPago) VALUES
 ('2024-01-16', 50.00, 12, 12, 'Pagada'), -- Zeus, Consulta Especializada
 ('2024-01-17', 50.00, 19, 19, 'Pagada'), -- Leo, Consulta Especializada
 ('2024-01-17', 50.00, 28, 29, 'Pagada'), -- Buddy, Consulta Especializada
-('2024-01-18', 55.00, 7, 7, 'Pagada'), -- Sasha, Radiografía
+('2024-01-18', 55.00, 7, 7, 'Pagada'), -- Sasha, Radiografia
 ('2024-01-20', 40.00, 1, 1, 'Pagada'), -- Max, Hemograma
 ('2024-01-20', 22.00, 2, 2, 'Pagada'),  -- Luna, Examen Heces
 ('2024-01-21', 35.00, 3, 3, 'Pagada'),
@@ -2581,7 +2669,7 @@ INSERT INTO Factura (Fecha, Total, ID_Propietario, ID_Cita, EstadoPago) VALUES
 ('2024-02-26', 15.00, 28, 27, 'Pagada'),
 ('2024-02-27', 35.00, 29, 28, 'Pagada'),
 ('2024-02-27', 12.00, 30, 29, 'Pagada'),
-('2024-02-28', 15.00, 31, 30, 'Pagada'),
+('2024-02-28', 15.00, 30, 30, 'Pagada'),  -- CORREGIDO: ID_Propietario cambiado de 31 a 30 (solo hay 30 propietarios)
 ('2024-02-28', 35.00, 10, 10, 'Pagada'),
 ('2024-02-29', 35.00, 15, 15, 'Pagada'),
 ('2024-02-29', 12.00, 2, 2, 'Pagada'),
@@ -2640,137 +2728,137 @@ GO
 -- 9. TABLA: Tratamiento 
 -- ====================================================
 INSERT INTO Tratamiento (Fecha, Diagnostico, ID_Mascota) VALUES
-('2024-01-05', 'Otitis externa aguda. Iniciar antibiótico tópico.', 1), -- Max (Perro)
+('2024-01-05', 'Otitis externa aguda. Iniciar antibiotico topico.', 1), -- Max (Perro)
 ('2024-01-05', 'Gingivitis leve. Se recomienda profilaxis dental.', 2), -- Luna (Gato)
 ('2024-01-15', 'Enfermedad articular degenerativa. Control de dolor.', 3), -- Rocky (Perro)
-('2024-01-15', 'Dermatitis atópica, brote agudo. Iniciar esteroides.', 5), -- Coco (Perro)
+('2024-01-15', 'Dermatitis atopica, brote agudo. Iniciar esteroides.', 5), -- Coco (Perro)
 ('2024-01-16', 'Soplo cardiaco Grado III. Se requiere ecocardiograma.', 8), -- Thor (Perro)
-('2024-01-17', 'Úlcera corneal superficial. Tratamiento con colirio antibiótico.', 19), -- Leo (Perro)
+('2024-01-17', 'ulcera corneal superficial. Tratamiento con colirio antibiotico.', 19), -- Leo (Perro)
 ('2024-01-20', 'Anaplasmosis canina (resultado positivo). Iniciar Doxiciclina.', 1), -- Max (Perro)
-('2024-01-22', 'Infección urinaria. Cultivo en proceso. Iniciar tratamiento empírico.', 10), -- Toby (Perro)
-('2024-01-26', 'Infección de vías respiratorias superiores (Gripe felina).', 6), -- Simba (Gato)
-('2024-01-28', 'Dermatitis por pulgas. Aplicación de antipulgas y antinflamatorio.', 12), -- Bella (Perro)
-('2024-02-02', 'Linfoma cutáneo. Inicio de protocolo de quimioterapia oral.', 20), -- Jack (Perro)
-('2024-02-05', 'Insuficiencia renal crónica (estadio II). Dieta y manejo de fluidos.', 24), -- Apolo (Perro)
-('2024-02-13', 'Trauma por caída. Múltiples contusiones y hematomas.', 23), -- Apolo (Perro)
-('2024-02-14', 'Control de parásitos. Desparasitación interna de rutina.', 1), -- Max
-('2024-02-14', 'Control de parásitos. Desparasitación interna de rutina.', 2), -- Luna
-('2024-02-14', 'Control de parásitos. Desparasitación interna de rutina.', 3), -- Rocky
-('2024-02-15', 'Control de parásitos. Desparasitación interna de rutina.', 4), -- Nala
-('2024-02-15', 'Control de parásitos. Desparasitación interna de rutina.', 5), -- Coco
-('2024-02-16', 'Control de parásitos. Desparasitación interna de rutina.', 6), -- Simba
-('2024-02-16', 'Control de parásitos. Desparasitación interna de rutina.', 7), -- Lola
-('2024-02-17', 'Control de parásitos. Desparasitación interna de rutina.', 8), -- Thor
-('2024-02-17', 'Control de parásitos. Desparasitación interna de rutina.', 9), -- Mía
-('2024-02-18', 'Control de parásitos. Desparasitación interna de rutina.', 10), -- Toby
-('2024-02-18', 'Control de parásitos. Desparasitación interna de rutina.', 12), -- Bella
-('2024-02-19', 'Control de parásitos. Desparasitación interna de rutina.', 14), -- Frida
-('2024-02-20', 'Control de parásitos. Desparasitación interna de rutina.', 16), -- Oreo
-('2024-02-21', 'Control de parásitos. Desparasitación interna de rutina.', 18), -- Cleo
-('2024-02-22', 'Control de parásitos. Desparasitación interna de rutina.', 20), -- Jack
-('2024-02-23', 'Control de parásitos. Desparasitación interna de rutina.', 22), -- Shadow
-('2024-02-24', 'Control de parásitos. Desparasitación interna de rutina.', 23), -- Apolo
-('2024-02-26', 'Control de parásitos. Desparasitación interna de rutina.', 27), -- Nina
-('2024-02-27', 'Control de parásitos. Desparasitación interna de rutina.', 28), -- Chispa
-('2024-02-27', 'Control de parásitos. Desparasitación interna de rutina.', 29), -- Buddy
-('2024-02-28', 'Control de parásitos. Desparasitación interna de rutina.', 30), -- Misha
-('2024-02-29', 'Control de parásitos. Desparasitación interna de rutina.', 31), -- Hachi
-('2024-03-01', 'Control de parásitos. Desparasitación interna de rutina.', 35), -- Sasha
+('2024-01-22', 'Infeccion urinaria. Cultivo en proceso. Iniciar tratamiento empirico.', 10), -- Toby (Perro)
+('2024-01-26', 'Infeccion de vias respiratorias superiores (Gripe felina).', 6), -- Simba (Gato)
+('2024-01-28', 'Dermatitis por pulgas. Aplicacion de antipulgas y antinflamatorio.', 12), -- Bella (Perro)
+('2024-02-02', 'Linfoma cutaneo. Inicio de protocolo de quimioterapia oral.', 20), -- Jack (Perro)
+('2024-02-05', 'Insuficiencia renal cronica (estadio II). Dieta y manejo de fluidos.', 24), -- Apolo (Perro)
+('2024-02-13', 'Trauma por caida. Multiples contusiones y hematomas.', 23), -- Apolo (Perro)
+('2024-02-14', 'Control de parasitos. Desparasitacion interna de rutina.', 1), -- Max
+('2024-02-14', 'Control de parasitos. Desparasitacion interna de rutina.', 2), -- Luna
+('2024-02-14', 'Control de parasitos. Desparasitacion interna de rutina.', 3), -- Rocky
+('2024-02-15', 'Control de parasitos. Desparasitacion interna de rutina.', 4), -- Nala
+('2024-02-15', 'Control de parasitos. Desparasitacion interna de rutina.', 5), -- Coco
+('2024-02-16', 'Control de parasitos. Desparasitacion interna de rutina.', 6), -- Simba
+('2024-02-16', 'Control de parasitos. Desparasitacion interna de rutina.', 7), -- Lola
+('2024-02-17', 'Control de parasitos. Desparasitacion interna de rutina.', 8), -- Thor
+('2024-02-17', 'Control de parasitos. Desparasitacion interna de rutina.', 9), -- Mia
+('2024-02-18', 'Control de parasitos. Desparasitacion interna de rutina.', 10), -- Toby
+('2024-02-18', 'Control de parasitos. Desparasitacion interna de rutina.', 12), -- Bella
+('2024-02-19', 'Control de parasitos. Desparasitacion interna de rutina.', 14), -- Frida
+('2024-02-20', 'Control de parasitos. Desparasitacion interna de rutina.', 16), -- Oreo
+('2024-02-21', 'Control de parasitos. Desparasitacion interna de rutina.', 18), -- Cleo
+('2024-02-22', 'Control de parasitos. Desparasitacion interna de rutina.', 20), -- Jack
+('2024-02-23', 'Control de parasitos. Desparasitacion interna de rutina.', 22), -- Shadow
+('2024-02-24', 'Control de parasitos. Desparasitacion interna de rutina.', 23), -- Apolo
+('2024-02-26', 'Control de parasitos. Desparasitacion interna de rutina.', 27), -- Nina
+('2024-02-27', 'Control de parasitos. Desparasitacion interna de rutina.', 28), -- Chispa
+('2024-02-27', 'Control de parasitos. Desparasitacion interna de rutina.', 29), -- Buddy
+('2024-02-28', 'Control de parasitos. Desparasitacion interna de rutina.', 30), -- Misha
+('2024-02-29', 'Control de parasitos. Desparasitacion interna de rutina.', 31), -- Hachi
+('2024-03-01', 'Control de parasitos. Desparasitacion interna de rutina.', 35), -- Sasha
 -- Tratamientos de seguimiento y nuevos casos
-('2024-03-02', 'Control de Otitis. Mejoría, continuar con gotas 5 días más.', 1),
-('2024-03-03', 'Control de Dolor Crónico. Ajuste de dosis de Meloxicam.', 3),
-('2024-03-04', 'Revisión de piel. La dermatitis mejora con tratamiento. Reducir dosis de Prednisona.', 5),
-('2024-03-05', 'Revisión Úlcera Corneal. Curación completa. Suspensión de tratamiento.', 19),
-('2024-03-06', 'Gastroenteritis aguda. Dieta blanda y antieméticos.', 7),
-('2024-03-07', 'Mordedura de otro perro. Herida superficial. Sutura simple y antibiótico.', 29),
-('2024-03-08', 'Sospecha de intoxicación por raticida. Administrar Vitamina K.', 10),
-('2024-03-09', 'Chequeo geriátrico. Iniciar suplemento articular.', 21),
+('2024-03-02', 'Control de Otitis. Mejoria, continuar con gotas 5 dias mas.', 1),
+('2024-03-03', 'Control de Dolor Cronico. Ajuste de dosis de Meloxicam.', 3),
+('2024-03-04', 'Revision de piel. La dermatitis mejora con tratamiento. Reducir dosis de Prednisona.', 5),
+('2024-03-05', 'Revision ulcera Corneal. Curacion completa. Suspension de tratamiento.', 19),
+('2024-03-06', 'Gastroenteritis aguda. Dieta blanda y antiemeticos.', 7),
+('2024-03-07', 'Mordedura de otro perro. Herida superficial. Sutura simple y antibiotico.', 29),
+('2024-03-08', 'Sospecha de intoxicacion por raticida. Administrar Vitamina K.', 10),
+('2024-03-09', 'Chequeo geriotrico. Iniciar suplemento articular.', 21),
 ('2024-03-10', 'Problemas dentales severos. Programar Limpieza Dental y posibles extracciones.', 23),
-('2024-03-11', 'Absceso en pata. Drenaje y antibiótico.', 26),
-('2024-03-12', 'Vigilancia de enfermedad cardiaca. Próxima revisión en 3 meses.', 8),
-('2024-03-13', 'Chequeo de mascota exótica. Dieta y ambiente óptimos.', 11),
-('2024-03-14', 'Revisión de la Leucemia Felina. Parámetros estables.', 14),
-('2024-03-15', 'Otitis crónica. Mantenimiento con limpiador de oídos.', 17),
-('2024-03-16', 'Revisión de ISR (Insuficiencia Renal). Ajuste de fluidos subcutáneos.', 24),
-('2024-03-17', 'Problema de comportamiento: Ansiedad por separación. Iniciar terapia conductual y medicación.', 35),
-('2024-03-18', 'Cálculos en vejiga (Diagnóstico por ultrasonido). Programar cistotomía.', 19),
+('2024-03-11', 'Absceso en pata. Drenaje y antibiotico.', 26),
+('2024-03-12', 'Vigilancia de enfermedad cardiaca. Proxima revision en 3 meses.', 8),
+('2024-03-13', 'Chequeo de mascota exotica. Dieta y ambiente optimos.', 11),
+('2024-03-14', 'Revision de la Leucemia Felina. Parametros estables.', 14),
+('2024-03-15', 'Otitis cronica. Mantenimiento con limpiador de oidos.', 17),
+('2024-03-16', 'Revision de ISR (Insuficiencia Renal). Ajuste de fluidos subcutaneos.', 24),
+('2024-03-17', 'Problema de comportamiento: Ansiedad por separacion. Iniciar terapia conductual y medicacion.', 35),
+('2024-03-18', 'Calculos en vejiga (Diagnostico por ultrasonido). Programar cistotomia.', 19),
 ('2024-03-19', 'Tos de perrera. Iniciar Doxiciclina y antitusivo.', 3),
-('2024-03-20', 'Infección en herida post-quirúrgica (cirugía anterior). Lavado y antibiótico.', 23),
-('2024-03-21', 'Control de desparasitación. Sin parásitos en heces.', 1),
-('2024-03-22', 'Control de desparasitación. Sin parásitos en heces.', 2),
+('2024-03-20', 'Infeccion en herida post-quirurgica (cirugia anterior). Lavado y antibiotico.', 23),
+('2024-03-21', 'Control de desparasitacion. Sin parasitos en heces.', 1),
+('2024-03-22', 'Control de desparasitacion. Sin parasitos en heces.', 2),
 ('2024-03-23', 'Control de dolor por osteoartritis. Meloxicam.', 12),
-('2024-03-24', 'Deshidratación por vómitos. Fluidoterapia IV.', 7),
-('2024-03-25', 'Sospecha de tumoración abdominal. Cita para TAC.', 8),
-('2024-03-26', 'Alergia alimentaria. Cambio a dieta hipoalergénica.', 5),
+('2024-03-24', 'Deshidratacion por vomitos. Fluidoterapia IV.', 7),
+('2024-03-25', 'Sospecha de tumoracion abdominal. Cita para TAC.', 8),
+('2024-03-26', 'Alergia alimentaria. Cambio a dieta hipoalergenica.', 5),
 ('2024-03-27', 'Eclampsia postparto (emergencia). Calcio IV y monitoreo.', 28),
-('2024-03-28', 'Dermatitis fúngica. Tratamiento con Ketoconazol tópico.', 10),
+('2024-03-28', 'Dermatitis fungica. Tratamiento con Ketoconazol topico.', 10),
 ('2024-03-29', 'Problemas de motilidad intestinal. Cisaprida.', 13),
 ('2024-03-30', 'Control de anemia. Suplemento de hierro.', 15),
-('2024-03-31', 'Revisión de mordedura (control). Herida sana.', 29),
--- Más seguimientos de tratamientos
+('2024-03-31', 'Revision de mordedura (control). Herida sana.', 29),
+-- Mas seguimientos de tratamientos
 ('2024-04-01', 'Seguimiento de Anaplasmosis. Control de hemograma.', 1),
-('2024-04-02', 'Seguimiento de IRA. Parámetros renales estables.', 24),
-('2024-04-03', 'Control de Gastroenteritis. Dieta blanda continúa.', 7),
-('2024-04-04', 'Control de Tos de Perrera. Mejoría notable.', 3),
-('2024-04-05', 'Revisión de ansiedad. Dosis de medicación estable.', 35),
+('2024-04-02', 'Seguimiento de IRA. Parametros renales estables.', 24),
+('2024-04-03', 'Control de Gastroenteritis. Dieta blanda continua.', 7),
+('2024-04-04', 'Control de Tos de Perrera. Mejoria notable.', 3),
+('2024-04-05', 'Revisiin de ansiedad. Dosis de medicacion estable.', 35),
 ('2024-04-06', 'Control de Absceso. Listo para retirar puntos.', 26),
 ('2024-04-07', 'Control de Linfoma. Quimioterapia tolerada.', 20),
-('2024-04-08', 'Revisión de Sonda de alimentación (anterior hospitalización).', 23),
+('2024-04-08', 'Revision de Sonda de alimentacion (anterior hospitalizacion).', 23),
 ('2024-04-09', 'Dolor en la espalda. Reposo y antiinflamatorio (Meloxicam).', 31),
-('2024-04-10', 'Revisión de piel por Dermatitis. Cambio de medicación.', 5),
-('2024-04-11', 'Vómitos esporádicos. Antiácido (Omeprazol) y ayuno.', 14),
-('2024-04-12', 'Revisión de úlcera corneal (nuevo caso). Aplicación de antibiótico.', 12),
+('2024-04-10', 'Revision de piel por Dermatitis. Cambio de medicacion.', 5),
+('2024-04-11', 'Vomitos esporidicos. Antiacido (Omeprazol) y ayuno.', 14),
+('2024-04-12', 'Revision de ulcera corneal (nuevo caso). Aplicacion de antibiotico.', 12),
 ('2024-04-13', 'Control de Gingivitis. Se programa la profilaxis dental.', 2),
-('2024-04-14', 'Infección ocular. Colirio de Tilosina.', 9),
+('2024-04-14', 'Infeccion ocular. Colirio de Tilosina.', 9),
 ('2024-04-15', 'Tratamiento preventivo para Leishmania (viaje).', 1),
 ('2024-04-16', 'Dolor por Osteoartritis. Reajuste de dosis de Gabapentina.', 3),
-('2024-04-17', 'Revisión de masa en cuello. Punción (FNA) para citología.', 5),
+('2024-04-17', 'Revision de masa en cuello. Puncion (FNA) para citologia.', 5),
 ('2024-04-18', 'Control de hipertiroidismo (nuevo caso). Iniciar Metimazol.', 14),
-('2024-04-19', 'Seguimiento de mordedura grave. Curación por segunda intención.', 29),
-('2024-04-20', 'Otitis media. Tratamiento con Maropitant y antibiótico sistémico.', 8),
-('2024-04-21', 'Revisión de la alimentación en conejos. Ajuste de heno.', 25),
+('2024-04-19', 'Seguimiento de mordedura grave. Curacion por segunda intenciï¿½n.', 29),
+('2024-04-20', 'Otitis media. Tratamiento con Maropitant y antibiotico sistemico.', 8),
+('2024-04-21', 'Revision de la alimentacion en conejos. Ajuste de heno.', 25),
 ('2024-04-22', 'Profilaxis dental post-operatoria. Recomendaciones de cepillado.', 23),
-('2024-04-23', 'Alergia ambiental. Antihistamínico.', 7),
-('2024-04-24', 'Chequeo pre-quirúrgico para esterilización.', 28),
-('2024-04-25', 'Infección de herida. Limpieza y curación.', 31),
+('2024-04-23', 'Alergia ambiental. Antihistamanico.', 7),
+('2024-04-24', 'Chequeo pre-quirurgico para esterilizacion.', 28),
+('2024-04-25', 'Infeccion de herida. Limpieza y curacion.', 31),
 ('2024-04-26', 'Control de dolor por fractura antigua. Tramadol.', 19),
-('2024-04-27', 'Revisión de anemia felina. Transfusión de sangre.', 15),
-('2024-04-28', 'Diagnóstico de Piómetra. Cirugía de emergencia programada.', 28),
+('2024-04-27', 'Revisiï¿½n de anemia felina. Transfusion de sangre.', 15),
+('2024-04-28', 'Diagnï¿½stico de Piï¿½metra. Cirugï¿½a de emergencia programada.', 28),
 ('2024-04-29', 'Dolor articular. Carprofeno.', 10),
-('2024-04-30', 'Infección en pata. Cefalexina.', 5),
-('2024-05-01', 'Revisión de Anaplasmosis. Hemograma con mejoría.', 1),
+('2024-04-30', 'Infecciï¿½n en pata. Cefalexina.', 5),
+('2024-05-01', 'Revisiï¿½n de Anaplasmosis. Hemograma con mejorï¿½a.', 1),
 ('2024-05-02', 'Control de tos. Antitusivo.', 3),
 ('2024-05-03', 'Gastroenteritis (leve). Dieta blanda.', 7),
-('2024-05-04', 'Dermatitis. Tratamiento tópico.', 5),
+('2024-05-04', 'Dermatitis. Tratamiento tï¿½pico.', 5),
 ('2024-05-05', 'Control de ansiedad. Ajuste de dosis.', 35),
-('2024-05-06', 'Chequeo de mascota geriátrica. Sin cambios.', 21),
+('2024-05-06', 'Chequeo de mascota geriï¿½trica. Sin cambios.', 21),
 ('2024-05-07', 'Dolor por Osteoartritis. Meloxicam.', 12),
-('2024-05-08', 'Revisión de IRC. Fluidos subcutáneos.', 24),
-('2024-05-09', 'Absceso. Drenaje y antibiótico.', 26),
-('2024-05-10', 'Control post-cirugía dental.', 2),
-('2024-05-11', 'Infección ocular. Colirio de Tilosina.', 9),
-('2024-05-12', 'Revisión de Anemia. Suplemento de hierro.', 15),
+('2024-05-08', 'Revisiï¿½n de IRC. Fluidos subcutï¿½neos.', 24),
+('2024-05-09', 'Absceso. Drenaje y antibiï¿½tico.', 26),
+('2024-05-10', 'Control post-cirugï¿½a dental.', 2),
+('2024-05-11', 'Infecciï¿½n ocular. Colirio de Tilosina.', 9),
+('2024-05-12', 'Revisiï¿½n de Anemia. Suplemento de hierro.', 15),
 ('2024-05-13', 'Control de hipertiroidismo. Dosis estable.', 14),
-('2024-05-14', 'Dolor abdominal. Radiografía y antiinflamatorio.', 10),
-('2024-05-15', 'Revisión de mordedura (final). Cicatrización completa.', 29),
-('2024-05-16', 'Tos de perrera (recaída). Doxiciclina y antitusivo.', 3),
-('2024-05-17', 'Otitis. Tratamiento tópico.', 1),
+('2024-05-14', 'Dolor abdominal. Radiografï¿½a y antiinflamatorio.', 10),
+('2024-05-15', 'Revisiï¿½n de mordedura (final). Cicatrizaciï¿½n completa.', 29),
+('2024-05-16', 'Tos de perrera (recaï¿½da). Doxiciclina y antitusivo.', 3),
+('2024-05-17', 'Otitis. Tratamiento tï¿½pico.', 1),
 ('2024-05-18', 'Control de dolor por fractura antigua. Tramadol.', 19),
-('2024-05-19', 'Alergia ambiental. Antihistamínico.', 7),
-('2024-05-20', 'Control de tumoración. Pendiente citología.', 5),
-('2024-05-21', 'Chequeo de mascota exótica. Sin problemas.', 11),
+('2024-05-19', 'Alergia ambiental. Antihistamï¿½nico.', 7),
+('2024-05-20', 'Control de tumoraciï¿½n. Pendiente citologï¿½a.', 5),
+('2024-05-21', 'Chequeo de mascota exï¿½tica. Sin problemas.', 11),
 ('2024-05-22', 'Dolor articular. Carprofeno.', 31),
-('2024-05-23', 'Revisión de Piómetra (post-cirugía). Retiro de puntos.', 28),
-('2024-05-24', 'Dermatitis fúngica. Tratamiento tópico.', 10),
+('2024-05-23', 'Revisiï¿½n de Piï¿½metra (post-cirugï¿½a). Retiro de puntos.', 28),
+('2024-05-24', 'Dermatitis fï¿½ngica. Tratamiento tï¿½pico.', 10),
 ('2024-05-25', 'Problemas de motilidad intestinal. Cisaprida.', 13),
 ('2024-05-26', 'Control de hipertiroidismo. Reajuste de dosis.', 14),
-('2024-05-27', 'Infección en pata. Cefalexina.', 31),
-('2024-05-28', 'Revisión de úlcera corneal. Curación en proceso.', 12),
-('2024-05-29', 'Control de Lymphoma. Próxima quimioterapia.', 20),
+('2024-05-27', 'Infecciï¿½n en pata. Cefalexina.', 31),
+('2024-05-28', 'Revisiï¿½n de ï¿½lcera corneal. Curaciï¿½n en proceso.', 12),
+('2024-05-29', 'Control de Lymphoma. Prï¿½xima quimioterapia.', 20),
 ('2024-05-30', 'Seguimiento de anemia felina. Suplemento de hierro.', 15),
-('2024-05-31', 'Otitis crónica. Mantenimiento con limpiador.', 17),
+('2024-05-31', 'Otitis crï¿½nica. Mantenimiento con limpiador.', 17),
 ('2024-06-01', 'Dolor por Osteoartritis. Meloxicam.', 12),
-('2024-06-02', 'Revisión de IRC. Dieta renal.', 24);
+('2024-06-02', 'Revisiï¿½n de IRC. Dieta renal.', 24);
 GO
 
 -- ====================================================
@@ -2778,39 +2866,39 @@ GO
 -- ====================================================
 INSERT INTO Tratamiento_Medicamento (ID_Tratamiento, ID_Medicamento) VALUES
 (1, 1), (1, 3), -- Otitis: Amoxicilina + Meloxicam
-(2, 23), -- Gingivitis: Propofol (si se requiere sedación para examinar)
+(2, 23), -- Gingivitis: Propofol (si se requiere sedaciï¿½n para examinar)
 (3, 3), (3, 8), -- Osteoartritis: Meloxicam + Gabapentina
 (4, 2), (4, 12), -- Dermatitis: Prednisona + Cefalexina
 (5, 5), (5, 6), -- Soplo Cardiaco: Furosemida + Enalapril
-(6, 11), -- Úlcera corneal: Doxiciclina (colirio o sistémico)
+(6, 11), -- ï¿½lcera corneal: Doxiciclina (colirio o sistï¿½mico)
 (7, 11), -- Anaplasmosis: Doxiciclina
-(8, 12), (8, 14), -- Infección urinaria: Cefalexina + Sucralfato (protector)
-(9, 11), (9, 16), -- Gripe Felina: Doxiciclina + Maropitant (antivomitivo/náusea)
+(8, 12), (8, 14), -- Infecciï¿½n urinaria: Cefalexina + Sucralfato (protector)
+(9, 11), (9, 16), -- Gripe Felina: Doxiciclina + Maropitant (antivomitivo/nï¿½usea)
 (10, 2), (10, 17), -- Dermatitis por pulgas: Prednisona + Ivermectina
-(11, 2), (11, 15), -- Linfoma cutáneo: Prednisona + Ondansetrón
+(11, 2), (11, 15), -- Linfoma cutï¿½neo: Prednisona + Ondansetrï¿½n
 (12, 5), (12, 28), -- IRC: Furosemida + Suero Salino
 (13, 3), (13, 27), -- Trauma: Meloxicam + Suero Ringer
-(14, 20), -- Desparasitación: Praziquantel
+(14, 20), -- Desparasitaciï¿½n: Praziquantel
 (15, 20), (16, 20), (17, 20), (18, 20), (19, 20), (20, 20), (21, 20), (22, 20), (23, 20), (24, 20), (25, 20), (26, 20), (27, 20), (28, 20), (29, 20), (30, 20), (31, 20), (32, 20), (33, 20), (34, 20), (35, 20),
 (36, 1), (36, 25), -- Control de Otitis: Amoxicilina + Clorhexidina
 (37, 3), (37, 8), -- Control de dolor: Meloxicam + Gabapentina
 (38, 2), (38, 1), -- Dermatitis: Prednisona + Amoxicilina
-(39, 11), -- Úlcera Corneal: Doxiciclina
+(39, 11), -- ï¿½lcera Corneal: Doxiciclina
 (40, 16), (40, 14), -- Gastroenteritis: Maropitant + Sucralfato
 (41, 1), (41, 26), -- Mordedura: Amoxicilina + Yodo Povidona
-(42, 29), (42, 27), -- Intoxicación: Vitamina K + Suero Ringer
-(43, 3), -- Chequeo geriátrico: Meloxicam
+(42, 29), (42, 27), -- Intoxicaciï¿½n: Vitamina K + Suero Ringer
+(43, 3), -- Chequeo geriï¿½trico: Meloxicam
 (44, 23), -- Problemas dentales: Propofol (para examen)
 (45, 12), (45, 25), -- Absceso: Cefalexina + Clorhexidina
 (46, 5), (46, 6), -- Enfermedad cardiaca: Furosemida + Enalapril
-(47, 12), -- Mascota exótica: Cefalexina (preventivo si aplica)
+(47, 12), -- Mascota exï¿½tica: Cefalexina (preventivo si aplica)
 (48, 2), -- Leucemia felina: Prednisona
-(49, 1), -- Otitis crónica: Amoxicilina
+(49, 1), -- Otitis crï¿½nica: Amoxicilina
 (50, 28), -- IRC: Suero Salino
 (51, 8), (51, 2), -- Ansiedad: Gabapentina + Prednisona
-(52, 1), (52, 3), -- Cálculos: Amoxicilina + Meloxicam
+(52, 1), (52, 3), -- Cï¿½lculos: Amoxicilina + Meloxicam
 (53, 11), (53, 9), -- Tos de perrera: Doxiciclina + Tramadol (antitusivo)
-(54, 1), (54, 25), -- Infección post-quirúrgica: Amoxicilina + Clorhexidina
+(54, 1), (54, 25), -- Infecciï¿½n post-quirï¿½rgica: Amoxicilina + Clorhexidina
 (55, 20), (56, 20), (57, 3), (57, 8), (58, 16), (58, 27), (59, 15), (59, 27), (60, 2), (60, 11), (61, 28), (61, 27), (62, 1), (62, 25), (63, 1), (63, 2), (64, 11), (64, 16), (65, 3), (65, 8), (66, 2), (67, 1), (68, 11), (69, 16), (70, 2), (70, 17), (71, 25), (72, 23), (73, 2), (74, 1), (75, 12), (75, 3), (76, 9), (77, 12), (78, 11), (78, 28), (79, 1), (79, 3), (80, 2), (80, 12), (81, 2), (81, 11), (82, 3), (82, 8), (83, 1), (83, 27), (84, 1), (84, 25), (85, 3), (85, 8), (86, 1), (86, 12), (87, 2), (88, 11), (88, 16), (89, 2), (89, 27), (90, 1), (90, 3), (91, 11), (92, 12), (93, 2), (94, 3), (95, 1), (95, 11), (96, 14), (96, 16), (97, 1), (97, 2), (98, 3), (98, 8), (99, 11), (100, 27), (100, 28), (101, 1), (102, 3), (102, 8), (103, 16), (103, 14), (104, 2), (105, 11), (106, 2), (106, 17), (107, 12), (107, 3), (108, 9), (109, 12), (110, 2);
 GO
 
@@ -2818,61 +2906,61 @@ GO
 -- 11. TABLA: Hospitalizacion (30 Registros)
 -- ====================================================
 INSERT INTO Hospitalizacion (FechaIngreso, FechaSalida, Observaciones, ID_Mascota) VALUES
-('2024-01-25', '2024-01-28', 'Diagnóstico de Pancreatitis. Fluidoterapia IV y control de dolor. Estuvo 3 días.', 7), -- Lola
-('2024-01-27', '2024-01-27', 'Observación por post-quirúrgico de tumor. Alta el mismo día.', 1), -- Max
-('2024-02-13', '2024-02-15', 'Trauma grave por atropello. Monitoreo constante, sonda de alimentación. 2 días.', 23), -- Apolo
-('2024-02-20', '2024-02-25', 'Insuficiencia Renal Aguda, requiere fluidos de por vida. Hospitalización inicial 5 días.', 24), -- Apolo
-('2024-03-08', '2024-03-09', 'Sospecha de intoxicación. Lavado gástrico y fluidoterapia. 1 día.', 10), -- Toby
-('2024-03-27', '2024-03-28', 'Eclampsia (convulsiones postparto). Calcio IV y estabilización. 1 día.', 28), -- Chispa
-('2024-04-27', '2024-04-27', 'Anemia Felina grave. Transfusión de sangre. Monitoreo intensivo de 6 horas. (Se registra como 1 día).', 15), -- Oreo
-('2024-04-28', '2024-05-01', 'Piómetra. Cirugía de emergencia (Ovariohisterectomía). Postoperatorio 3 días.', 28), -- Chispa
-('2024-05-18', '2024-05-20', 'Deshidratación severa por gastroenteritis. Fluidoterapia y reposo. 2 días.', 7), -- Lola
-('2024-05-25', '2024-05-26', 'Crisis de hipertiroidismo felino. Monitoreo cardiaco. 1 día.', 14), -- Frida
-('2024-06-05', '2024-06-06', 'Dificultad respiratoria. Terapia con oxígeno y nebulización. 1 día.', 3), -- Rocky
-('2024-06-15', '2024-06-17', 'Vómitos incoercibles. Hospitalización para diagnóstico y tratamiento. 2 días.', 5), -- Coco
-('2024-06-25', '2024-06-25', 'Pre-quirúrgico de Cirugía Ortopédica. Observación.', 19), -- Leo
-('2024-07-01', '2024-07-03', 'Fiebre de origen desconocido. Hemocultivos. 2 días.', 1), -- Max
-('2024-07-10', '2024-07-11', 'Trauma ocular. Tratamiento intensivo con colirios. 1 día.', 12), -- Bella
-('2024-07-20', '2024-07-21', 'Anorexia felina. Sonda de alimentación. 1 día.', 2), -- Luna
-('2024-08-01', '2024-08-03', 'Hemorragia gastrointestinal. Transfusión y monitoreo. 2 días.', 10), -- Toby
-('2024-08-10', '2024-08-12', 'Neumonía. Antibiótico IV y nebulizaciones. 2 días.', 35), -- Sasha
-('2024-08-20', '2024-08-22', 'Postoperatorio de extracción dental compleja. 2 días.', 23), -- Apolo
-('2024-09-01', '2024-09-04', 'Parvovirus canino (cachorro). 3 días.', 30), -- Misha
-('2024-09-10', '2024-09-11', 'Crisis asmática. Terapia inhalada. 1 día.', 4), -- Nala
-('2024-09-20', '2024-09-22', 'Diabetes descompensada. Ajuste de insulina. 2 días.', 8), -- Thor
-('2024-10-01', '2024-10-05', 'Infección abdominal grave. 4 días.', 7), -- Lola
-('2024-10-10', '2024-10-10', 'Intoxicación leve. Observación y fluidos. 6 horas (1 día).', 1), -- Max
-('2024-10-20', '2024-10-22', 'Control de dolor por cáncer. 2 días.', 20), -- Jack
-('2024-11-01', '2024-11-01', 'Pre-quirúrgico de Cirugía de Tumor. Observación.', 5), -- Coco
-('2024-11-10', '2024-11-12', 'Hepatitis aguda. Tratamiento de soporte. 2 días.', 31), -- Hachi
-('2024-12-01', '2024-12-03', 'Fractura de pata (Post-cirugía). Cuidado post-ortopedia. 2 días.', 19), -- Leo
-('2024-12-10', '2024-12-14', 'Fallo Renal Crónico (descompensación). Fluidoterapia. 4 días.', 24); -- Apolo
+('2024-01-25', '2024-01-28', 'Diagnï¿½stico de Pancreatitis. Fluidoterapia IV y control de dolor. Estuvo 3 dï¿½as.', 7), -- Lola
+('2024-01-27', '2024-01-27', 'Observaciï¿½n por post-quirï¿½rgico de tumor. Alta el mismo dï¿½a.', 1), -- Max
+('2024-02-13', '2024-02-15', 'Trauma grave por atropello. Monitoreo constante, sonda de alimentaciï¿½n. 2 dï¿½as.', 23), -- Apolo
+('2024-02-20', '2024-02-25', 'Insuficiencia Renal Aguda, requiere fluidos de por vida. Hospitalizaciï¿½n inicial 5 dï¿½as.', 24), -- Apolo
+('2024-03-08', '2024-03-09', 'Sospecha de intoxicaciï¿½n. Lavado gï¿½strico y fluidoterapia. 1 dï¿½a.', 10), -- Toby
+('2024-03-27', '2024-03-28', 'Eclampsia (convulsiones postparto). Calcio IV y estabilizaciï¿½n. 1 dï¿½a.', 28), -- Chispa
+('2024-04-27', '2024-04-27', 'Anemia Felina grave. Transfusiï¿½n de sangre. Monitoreo intensivo de 6 horas. (Se registra como 1 dï¿½a).', 15), -- Oreo
+('2024-04-28', '2024-05-01', 'Piï¿½metra. Cirugï¿½a de emergencia (Ovariohisterectomï¿½a). Postoperatorio 3 dï¿½as.', 28), -- Chispa
+('2024-05-18', '2024-05-20', 'Deshidrataciï¿½n severa por gastroenteritis. Fluidoterapia y reposo. 2 dï¿½as.', 7), -- Lola
+('2024-05-25', '2024-05-26', 'Crisis de hipertiroidismo felino. Monitoreo cardiaco. 1 dï¿½a.', 14), -- Frida
+('2024-06-05', '2024-06-06', 'Dificultad respiratoria. Terapia con oxï¿½geno y nebulizaciï¿½n. 1 dï¿½a.', 3), -- Rocky
+('2024-06-15', '2024-06-17', 'Vï¿½mitos incoercibles. Hospitalizaciï¿½n para diagnï¿½stico y tratamiento. 2 dï¿½as.', 5), -- Coco
+('2024-06-25', '2024-06-25', 'Pre-quirï¿½rgico de Cirugï¿½a Ortopï¿½dica. Observaciï¿½n.', 19), -- Leo
+('2024-07-01', '2024-07-03', 'Fiebre de origen desconocido. Hemocultivos. 2 dï¿½as.', 1), -- Max
+('2024-07-10', '2024-07-11', 'Trauma ocular. Tratamiento intensivo con colirios. 1 dï¿½a.', 12), -- Bella
+('2024-07-20', '2024-07-21', 'Anorexia felina. Sonda de alimentaciï¿½n. 1 dï¿½a.', 2), -- Luna
+('2024-08-01', '2024-08-03', 'Hemorragia gastrointestinal. Transfusiï¿½n y monitoreo. 2 dï¿½as.', 10), -- Toby
+('2024-08-10', '2024-08-12', 'Neumonï¿½a. Antibiï¿½tico IV y nebulizaciones. 2 dï¿½as.', 35), -- Sasha
+('2024-08-20', '2024-08-22', 'Postoperatorio de extracciï¿½n dental compleja. 2 dï¿½as.', 23), -- Apolo
+('2024-09-01', '2024-09-04', 'Parvovirus canino (cachorro). 3 dï¿½as.', 30), -- Misha
+('2024-09-10', '2024-09-11', 'Crisis asmï¿½tica. Terapia inhalada. 1 dï¿½a.', 4), -- Nala
+('2024-09-20', '2024-09-22', 'Diabetes descompensada. Ajuste de insulina. 2 dï¿½as.', 8), -- Thor
+('2024-10-01', '2024-10-05', 'Infecciï¿½n abdominal grave. 4 dï¿½as.', 7), -- Lola
+('2024-10-10', '2024-10-10', 'Intoxicaciï¿½n leve. Observaciï¿½n y fluidos. 6 horas (1 dï¿½a).', 1), -- Max
+('2024-10-20', '2024-10-22', 'Control de dolor por cï¿½ncer. 2 dï¿½as.', 20), -- Jack
+('2024-11-01', '2024-11-01', 'Pre-quirï¿½rgico de Cirugï¿½a de Tumor. Observaciï¿½n.', 5), -- Coco
+('2024-11-10', '2024-11-12', 'Hepatitis aguda. Tratamiento de soporte. 2 dï¿½as.', 31), -- Hachi
+('2024-12-01', '2024-12-03', 'Fractura de pata (Post-cirugï¿½a). Cuidado post-ortopedia. 2 dï¿½as.', 19), -- Leo
+('2024-12-10', '2024-12-14', 'Fallo Renal Crï¿½nico (descompensaciï¿½n). Fluidoterapia. 4 dï¿½as.', 24); -- Apolo
 GO
 
 -- ====================================================
 -- 12. TABLA: Cirugia (20 Registros)
 -- ====================================================
 INSERT INTO Cirugia (Fecha, Tipo, Descripcion, ID_Mascota, ID_Veterinario) VALUES
-('2024-01-27', 'Excisión de masa', 'Extracción de tumor cutáneo en hombro. Margen limpio.', 1, 1), -- Max con Dr. Solís (Cirugía General)
-('2024-02-12', 'Profilaxis Dental', 'Limpieza dental con ultrasonido. Sin extracciones.', 5, 14), -- Coco con Dra. Ponce (Odontología)
-('2024-02-28', 'Esterilización (OVH)', 'Ovariohisterectomía canina de rutina.', 28, 21), -- Chispa con Dr. Estrada (Cirugía General)
-('2024-03-18', 'Cistotomía', 'Extracción de cálculos vesicales. Envío a patología.', 19, 1), -- Leo con Dr. Solís (Cirugía General)
-('2024-04-28', 'OVH de emergencia', 'Ovariohisterectomía por Piómetra (Infección uterina).', 28, 21), -- Chispa con Dr. Estrada (Cirugía General)
-('2024-05-05', 'Esterilización (Castración)', 'Orquiectomía canina (castración).', 10, 1), -- Toby con Dr. Solís
-('2024-05-10', 'Extracciones Dentales', 'Profilaxis dental y extracción de 4 premolares.', 2, 14), -- Luna con Dra. Ponce
-('2024-06-26', 'Cirugía Ortopédica', 'Reparación de fractura de tibia con placa y tornillos.', 19, 15), -- Leo con Dr. Bendaña (Ortopédica)
-('2024-07-05', 'Extirpación de tumor', 'Mastectomía unilateral simple. Envío a patología.', 12, 21), -- Bella con Dr. Estrada
-('2024-08-05', 'Corrección de entropión', 'Cirugía palpebral para corregir párpado invertido.', 13, 13), -- Zeus con Dr. Fonseca (Oftalmología)
-('2024-09-05', 'Laparotomía Exploratoria', 'Abdomen agudo, se encontró cuerpo extraño en intestino. Remoción.', 7, 1), -- Lola con Dr. Solís
-('2024-10-01', 'Cirugía de Tumor (Masa abdominal)', 'Excisión de masa en bazo. Esplenectomía.', 8, 8), -- Thor con Dra. Téllez (Oncología)
-('2024-11-02', 'Biopsia incisional', 'Toma de muestra de tumoración mamaria.', 5, 21), -- Coco con Dr. Estrada
-('2024-12-05', 'Grooming Quirúrgico', 'Corte de pelo y limpieza profunda en sedación.', 33, 4), -- Copito (Hámster) con Dra. Campos (Exóticos)
-('2024-12-15', 'Extracción de dientes', 'Extracción dental en perro geriátrico.', 21, 14), -- Jack con Dra. Ponce
-('2025-01-05', 'Esterilización (Gata)', 'OVH felina.', 30, 21), -- Misha
-('2025-01-15', 'Cirugía Ortopédica', 'Fijación externa de fractura de fémur.', 31, 15), -- Hachi
-('2025-02-05', 'Excisión de Lipoma', 'Remoción de tumoración benigna de grasa.', 1, 1), -- Max
-('2025-03-05', 'Corrección de hernia umbilical', 'Herniorrafia de rutina.', 10, 21), -- Toby
-('2025-04-05', 'Amputación de cola', 'Amputación por lesión crónica.', 29, 1); -- Buddy
+('2024-01-27', 'Excisiï¿½n de masa', 'Extracciï¿½n de tumor cutï¿½neo en hombro. Margen limpio.', 1, 1), -- Max con Dr. Solï¿½s (Cirugï¿½a General)
+('2024-02-12', 'Profilaxis Dental', 'Limpieza dental con ultrasonido. Sin extracciones.', 5, 14), -- Coco con Dra. Ponce (Odontologï¿½a)
+('2024-02-28', 'Esterilizaciï¿½n (OVH)', 'Ovariohisterectomï¿½a canina de rutina.', 28, 21), -- Chispa con Dr. Estrada (Cirugï¿½a General)
+('2024-03-18', 'Cistotomï¿½a', 'Extracciï¿½n de cï¿½lculos vesicales. Envï¿½o a patologï¿½a.', 19, 1), -- Leo con Dr. Solï¿½s (Cirugï¿½a General)
+('2024-04-28', 'OVH de emergencia', 'Ovariohisterectomï¿½a por Piï¿½metra (Infecciï¿½n uterina).', 28, 21), -- Chispa con Dr. Estrada (Cirugï¿½a General)
+('2024-05-05', 'Esterilizaciï¿½n (Castraciï¿½n)', 'Orquiectomï¿½a canina (castraciï¿½n).', 10, 1), -- Toby con Dr. Solï¿½s
+('2024-05-10', 'Extracciones Dentales', 'Profilaxis dental y extracciï¿½n de 4 premolares.', 2, 14), -- Luna con Dra. Ponce
+('2024-06-26', 'Cirugï¿½a Ortopï¿½dica', 'Reparaciï¿½n de fractura de tibia con placa y tornillos.', 19, 15), -- Leo con Dr. Bendaï¿½a (Ortopï¿½dica)
+('2024-07-05', 'Extirpaciï¿½n de tumor', 'Mastectomï¿½a unilateral simple. Envï¿½o a patologï¿½a.', 12, 21), -- Bella con Dr. Estrada
+('2024-08-05', 'Correcciï¿½n de entropiï¿½n', 'Cirugï¿½a palpebral para corregir pï¿½rpado invertido.', 13, 13), -- Zeus con Dr. Fonseca (Oftalmologï¿½a)
+('2024-09-05', 'Laparotomï¿½a Exploratoria', 'Abdomen agudo, se encontrï¿½ cuerpo extraï¿½o en intestino. Remociï¿½n.', 7, 1), -- Lola con Dr. Solï¿½s
+('2024-10-01', 'Cirugï¿½a de Tumor (Masa abdominal)', 'Excisiï¿½n de masa en bazo. Esplenectomï¿½a.', 8, 8), -- Thor con Dra. Tï¿½llez (Oncologï¿½a)
+('2024-11-02', 'Biopsia incisional', 'Toma de muestra de tumoraciï¿½n mamaria.', 5, 21), -- Coco con Dr. Estrada
+('2024-12-05', 'Grooming Quirï¿½rgico', 'Corte de pelo y limpieza profunda en sedaciï¿½n.', 33, 4), -- Copito (Hï¿½mster) con Dra. Campos (Exï¿½ticos)
+('2024-12-15', 'Extracciï¿½n de dientes', 'Extracciï¿½n dental en perro geriï¿½trico.', 21, 14), -- Jack con Dra. Ponce
+('2025-01-05', 'Esterilizaciï¿½n (Gata)', 'OVH felina.', 30, 21), -- Misha
+('2025-01-15', 'Cirugï¿½a Ortopï¿½dica', 'Fijaciï¿½n externa de fractura de fï¿½mur.', 31, 15), -- Hachi
+('2025-02-05', 'Excisiï¿½n de Lipoma', 'Remociï¿½n de tumoraciï¿½n benigna de grasa.', 1, 1), -- Max
+('2025-03-05', 'Correcciï¿½n de hernia umbilical', 'Herniorrafia de rutina.', 10, 21), -- Toby
+('2025-04-05', 'Amputaciï¿½n de cola', 'Amputaciï¿½n por lesiï¿½n crï¿½nica.', 29, 1); -- Buddy
 GO
 
 -- ====================================================
@@ -2895,7 +2983,7 @@ INSERT INTO Mascota_Vacuna (ID_Mascota, ID_Vacuna) VALUES
 (7, 4), (7, 7), (7, 23), (7, 8), (7, 6),
 -- Mascota 8 (Thor - Perro)
 (8, 4), (8, 7), (8, 23), (8, 5), (8, 18),
--- Mascota 9 (Mía - Gato)
+-- Mascota 9 (Mï¿½a - Gato)
 (9, 11), (9, 13), (9, 24), (9, 18), (9, 14),
 -- Mascota 10 (Toby - Perro) - Cachorro
 (10, 4), (10, 5), (10, 6), (10, 7), (10, 1),
@@ -2943,7 +3031,7 @@ INSERT INTO Mascota_Vacuna (ID_Mascota, ID_Vacuna) VALUES
 (31, 7), (31, 1), (31, 23),
 -- Mascota 32 (Pancha - Tortuga)
 (32, 1), (32, 3),
--- Mascota 33 (Copito - Hámster)
+-- Mascota 33 (Copito - Hï¿½mster)
 (33, 1), (33, 3),
 -- Mascota 34 (Felix - Gato)
 (34, 11), (34, 13),
@@ -2951,7 +3039,7 @@ INSERT INTO Mascota_Vacuna (ID_Mascota, ID_Vacuna) VALUES
 (35, 7), (35, 1), (35, 23);
 GO
 
--- NOTA: La tabla DetalleHistoria no existe en el esquema, se omite esta sección
+-- NOTA: La tabla DetalleHistoria no existe en el esquema, se omite esta secciï¿½n
 -- ====================================================
 -- 14. TABLA: FacturaDetalle
 -- ====================================================
@@ -2983,157 +3071,48 @@ GO
 -- ====================================================
 -- 15. TABLA: Pago 
 -- ====================================================
-INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES
-(1, 'Tarjeta', 35.00, '2024-01-05'),
-(2, 'Efectivo', 35.00, '2024-01-05'),
-(3, 'Transferencia', 35.00, '2024-01-06'),
-(4, 'Tarjeta', 35.00, '2024-01-06'),
-(5, 'Efectivo', 35.00, '2024-01-06'),
-(6, 'Transferencia', 35.00, '2024-01-07'),
-(7, 'Tarjeta', 35.00, '2024-01-07'),
-(8, 'Efectivo', 35.00, '2024-01-07'),
-(9, 'Transferencia', 35.00, '2024-01-08'),
-(10, 'Tarjeta', 35.00, '2024-01-08'),
-(11, 'Efectivo', 30.00, '2024-01-10'),
-(12, 'Transferencia', 28.00, '2024-01-10'),
-(13, 'Tarjeta', 30.00, '2024-01-10'),
-(14, 'Efectivo', 28.00, '2024-01-11'),
-(15, 'Transferencia', 28.00, '2024-01-11'),
-(16, 'Tarjeta', 20.00, '2024-01-12'),
-(17, 'Efectivo', 28.00, '2024-01-12'),
-(18, 'Transferencia', 20.00, '2024-01-12'),
-(19, 'Tarjeta', 50.00, '2024-01-15'),
-(20, 'Efectivo', 50.00, '2024-01-15'),
-(21, 'Transferencia', 85.00, '2024-01-16'),
-(22, 'Tarjeta', 50.00, '2024-01-16'),
-(23, 'Efectivo', 50.00, '2024-01-17'),
-(24, 'Transferencia', 50.00, '2024-01-17'),
-(25, 'Tarjeta', 55.00, '2024-01-18'),
-(26, 'Efectivo', 40.00, '2024-01-20'),
-(27, 'Transferencia', 22.00, '2024-01-20'),
-(28, 'Tarjeta', 35.00, '2024-01-21'),
-(29, 'Efectivo', 35.00, '2024-01-21'),
-(30, 'Transferencia', 40.00, '2024-01-22'),
-(31, 'Tarjeta', 22.00, '2024-01-22'),
-(32, 'Efectivo', 30.00, '2024-01-25'),
-(33, 'Transferencia', 28.00, '2024-01-25'),
-(34, 'Tarjeta', 35.00, '2024-01-26'),
-(35, 'Efectivo', 35.00, '2024-01-26'),
-(36, 'Transferencia', 30.00, '2024-01-27'),
-(37, 'Tarjeta', 35.00, '2024-01-27'),
-(38, 'Efectivo', 35.00, '2024-01-28'),
-(39, 'Transferencia', 30.00, '2024-01-28'),
-(40, 'Tarjeta', 35.00, '2024-01-29'),
-(41, 'Efectivo', 35.00, '2024-01-29'),
-(42, 'Transferencia', 35.00, '2024-01-30'),
-(43, 'Tarjeta', 28.00, '2024-01-30'),
-(44, 'Efectivo', 35.00, '2024-01-31'),
-(45, 'Transferencia', 28.00, '2024-01-31'),
-(46, 'Tarjeta', 35.00, '2024-02-01'),
-(47, 'Efectivo', 28.00, '2024-02-01'),
-(48, 'Transferencia', 35.00, '2024-02-02'),
-(49, 'Tarjeta', 30.00, '2024-02-02'),
-(50, 'Efectivo', 35.00, '2024-02-03'),
-(51, 'Transferencia', 28.00, '2024-02-03'),
-(52, 'Tarjeta', 35.00, '2024-02-04'),
-(53, 'Efectivo', 35.00, '2024-02-04'),
-(54, 'Transferencia', 35.00, '2024-02-05'),
-(55, 'Tarjeta', 35.00, '2024-02-05'),
-(56, 'Efectivo', 28.00, '2024-02-06'),
-(57, 'Transferencia', 30.00, '2024-02-06'),
-(58, 'Tarjeta', 35.00, '2024-02-07'),
-(59, 'Efectivo', 28.00, '2024-02-07'),
-(60, 'Transferencia', 30.00, '2024-02-08'),
-(61, 'Tarjeta', 35.00, '2024-02-08'),
-(62, 'Efectivo', 35.00, '2024-02-09'),
-(63, 'Transferencia', 28.00, '2024-02-09'),
-(64, 'Tarjeta', 35.00, '2024-02-10'),
-(65, 'Efectivo', 110.00, '2024-02-12'),
-(66, 'Transferencia', 50.00, '2024-02-12'),
-(67, 'Tarjeta', 50.00, '2024-02-13'),
-(68, 'Efectivo', 50.00, '2024-02-13'),
-(69, 'Transferencia', 15.00, '2024-02-14'),
-(70, 'Tarjeta', 12.00, '2024-02-14'),
-(71, 'Efectivo', 15.00, '2024-02-14'),
-(72, 'Transferencia', 12.00, '2024-02-15'),
-(73, 'Tarjeta', 15.00, '2024-02-15'),
-(74, 'Efectivo', 12.00, '2024-02-16'),
-(75, 'Transferencia', 15.00, '2024-02-16'),
-(76, 'Tarjeta', 15.00, '2024-02-17'),
-(77, 'Efectivo', 15.00, '2024-02-17'),
-(78, 'Transferencia', 15.00, '2024-02-18'),
-(79, 'Tarjeta', 15.00, '2024-02-18'),
-(80, 'Efectivo', 35.00, '2024-02-19'),
-(81, 'Transferencia', 12.00, '2024-02-19'),
-(82, 'Tarjeta', 35.00, '2024-02-20'),
-(83, 'Efectivo', 12.00, '2024-02-20'),
-(84, 'Transferencia', 35.00, '2024-02-21'),
-(85, 'Tarjeta', 12.00, '2024-02-21'),
-(86, 'Efectivo', 35.00, '2024-02-22'),
-(87, 'Transferencia', 15.00, '2024-02-22'),
-(88, 'Tarjeta', 35.00, '2024-02-23'),
-(89, 'Efectivo', 12.00, '2024-02-23'),
-(90, 'Transferencia', 15.00, '2024-02-24'),
-(91, 'Tarjeta', 35.00, '2024-02-24'),
-(92, 'Efectivo', 35.00, '2024-02-25'),
-(93, 'Transferencia', 35.00, '2024-02-25'),
-(94, 'Tarjeta', 12.00, '2024-02-26'),
-(95, 'Efectivo', 15.00, '2024-02-26'),
-(96, 'Transferencia', 35.00, '2024-02-27'),
-(97, 'Tarjeta', 12.00, '2024-02-27'),
-(98, 'Efectivo', 15.00, '2024-02-28'),
-(99, 'Transferencia', 35.00, '2024-02-28'),
-(100, 'Tarjeta', 35.00, '2024-02-29'),
-(101, 'Efectivo', 12.00, '2024-02-29'),
-(102, 'Transferencia', 15.00, '2024-03-01'),
-(103, 'Tarjeta', 35.00, '2024-03-02'),
-(104, 'Efectivo', 35.00, '2024-03-02'),
-(105, 'Transferencia', 35.00, '2024-03-03'),
-(106, 'Tarjeta', 35.00, '2024-03-03'),
-(107, 'Efectivo', 35.00, '2024-03-04'),
-(108, 'Transferencia', 35.00, '2024-03-04'),
-(109, 'Tarjeta', 35.00, '2024-03-05'),
-(110, 'Efectivo', 35.00, '2024-03-05'),
-(111, 'Transferencia', 35.00, '2024-03-06'),
-(112, 'Tarjeta', 35.00, '2024-03-06'),
-(113, 'Efectivo', 35.00, '2024-03-07'),
-(114, 'Transferencia', 35.00, '2024-03-07'),
-(115, 'Tarjeta', 35.00, '2024-03-08'),
-(116, 'Efectivo', 35.00, '2024-03-08'),
-(117, 'Transferencia', 35.00, '2024-03-09'),
-(118, 'Tarjeta', 35.00, '2024-03-09'),
-(119, 'Efectivo', 35.00, '2024-03-10'),
-(120, 'Transferencia', 35.00, '2024-03-10'),
-(121, 'Tarjeta', 35.00, '2024-03-11'),
-(122, 'Efectivo', 35.00, '2024-03-11'),
-(123, 'Transferencia', 35.00, '2024-03-12'),
-(124, 'Tarjeta', 35.00, '2024-03-12'),
-(125, 'Efectivo', 35.00, '2024-03-13'),
-(126, 'Transferencia', 35.00, '2024-03-13'),
-(127, 'Tarjeta', 35.00, '2024-03-14'),
-(128, 'Efectivo', 35.00, '2024-03-14'),
-(129, 'Transferencia', 35.00, '2024-03-15'),
-(130, 'Tarjeta', 35.00, '2024-03-15'),
-(131, 'Efectivo', 35.00, '2024-03-16'),
-(132, 'Transferencia', 35.00, '2024-03-16'),
-(133, 'Tarjeta', 35.00, '2024-03-17'),
-(134, 'Efectivo', 35.00, '2024-03-17'),
-(135, 'Transferencia', 35.00, '2024-03-18'),
-(136, 'Tarjeta', 35.00, '2024-03-18'),
-(137, 'Efectivo', 35.00, '2024-03-19'),
-(138, 'Transferencia', 15.00, '2024-03-20'),
-(139, 'Tarjeta', 12.00, '2024-03-20'),
-(140, 'Efectivo', 15.00, '2024-03-20'),
-(141, 'Transferencia', 12.00, '2024-03-21'),
-(142, 'Tarjeta', 15.00, '2024-03-21'),
-(143, 'Efectivo', 12.00, '2024-03-22'),
-(144, 'Transferencia', 15.00, '2024-03-22'),
-(145, 'Tarjeta', 15.00, '2024-03-23'),
-(146, 'Efectivo', 15.00, '2024-03-23'),
-(147, 'Transferencia', 15.00, '2024-03-24'),
-(148, 'Tarjeta', 35.00, '2024-03-24'),
-(149, 'Efectivo', 15.00, '2024-03-25'),
-(150, 'Transferencia', 35.00, '2024-03-25');
+-- NOTA: Se insertan pagos solo para facturas que existen y estÃ¡n marcadas como 'Pagada'
+-- Esto evita errores de Foreign Key si alguna factura no se insertÃ³ correctamente
+INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago)
+SELECT F.ID_Factura, 
+       CASE (ROW_NUMBER() OVER (ORDER BY F.ID_Factura) % 3)
+           WHEN 0 THEN 'Tarjeta'
+           WHEN 1 THEN 'Efectivo'
+           ELSE 'Transferencia'
+       END AS MetodoPago,
+       F.Total AS Monto,
+       F.Fecha AS FechaPago
+FROM Factura F
+WHERE F.EstadoPago = 'Pagada'
+  AND NOT EXISTS (SELECT 1 FROM Pago P WHERE P.ID_Factura = F.ID_Factura)
+ORDER BY F.ID_Factura;
+GO
+
+-- Insertar pagos especÃ­ficos para las primeras facturas (si no se insertaron con el mÃ©todo anterior)
+-- Esto asegura que las facturas mÃ¡s importantes tengan pagos registrados
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 1)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (1, 'Tarjeta', 35.00, '2024-01-05');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 2)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (2, 'Efectivo', 35.00, '2024-01-05');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 3)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (3, 'Transferencia', 35.00, '2024-01-06');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 4)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (4, 'Tarjeta', 35.00, '2024-01-06');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 5)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (5, 'Efectivo', 35.00, '2024-01-06');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 6)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (6, 'Transferencia', 35.00, '2024-01-07');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 7)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (7, 'Tarjeta', 35.00, '2024-01-07');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 8)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (8, 'Efectivo', 35.00, '2024-01-07');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 9)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (9, 'Transferencia', 35.00, '2024-01-08');
+IF NOT EXISTS (SELECT 1 FROM Pago WHERE ID_Factura = 10)
+    INSERT INTO Pago (ID_Factura, MetodoPago, Monto, FechaPago) VALUES (10, 'Tarjeta', 35.00, '2024-01-08');
+GO
+
+PRINT 'Pagos insertados exitosamente para todas las facturas pagadas.';
 GO
 
 PRINT 'Script de datos completado exitosamente.';

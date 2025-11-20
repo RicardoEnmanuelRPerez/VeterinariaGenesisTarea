@@ -145,7 +145,7 @@ partial class DashboardVeterinarioForm
         gbxCirugias.Font = new Font("Segoe UI", 10F);
         gbxCirugias.Location = new Point(12, 100);
         gbxCirugias.Name = "gbxCirugias";
-        gbxCirugias.Size = new Size(826, 300);
+        gbxCirugias.Size = new Size(872, 300);
         gbxCirugias.TabIndex = 1;
         gbxCirugias.TabStop = false;
         gbxCirugias.Text = "Cirugías por Veterinario";
@@ -155,7 +155,7 @@ partial class DashboardVeterinarioForm
         formsPlotCirugias.DisplayScale = 1.25F;
         formsPlotCirugias.Location = new Point(366, 29);
         formsPlotCirugias.Name = "formsPlotCirugias";
-        formsPlotCirugias.Size = new Size(460, 260);
+        formsPlotCirugias.Size = new Size(500, 260);
         formsPlotCirugias.TabIndex = 1;
         // 
         // dgvCirugias
@@ -171,9 +171,9 @@ partial class DashboardVeterinarioForm
         // 
         gbxCitas.Controls.Add(formsPlotCitas);
         gbxCitas.Font = new Font("Segoe UI", 10F);
-        gbxCitas.Location = new Point(844, 100);
+        gbxCitas.Location = new Point(890, 100);
         gbxCitas.Name = "gbxCitas";
-        gbxCitas.Size = new Size(811, 300);
+        gbxCitas.Size = new Size(888, 300);
         gbxCitas.TabIndex = 2;
         gbxCitas.TabStop = false;
         gbxCitas.Text = "Citas por Día de la Semana";
@@ -181,9 +181,9 @@ partial class DashboardVeterinarioForm
         // formsPlotCitas
         // 
         formsPlotCitas.DisplayScale = 1.25F;
-        formsPlotCitas.Location = new Point(43, 30);
+        formsPlotCitas.Location = new Point(41, 30);
         formsPlotCitas.Name = "formsPlotCitas";
-        formsPlotCitas.Size = new Size(774, 260);
+        formsPlotCitas.Size = new Size(848, 260);
         formsPlotCitas.TabIndex = 0;
         // 
         // gbxProductividad
@@ -192,7 +192,7 @@ partial class DashboardVeterinarioForm
         gbxProductividad.Font = new Font("Segoe UI", 10F);
         gbxProductividad.Location = new Point(12, 410);
         gbxProductividad.Name = "gbxProductividad";
-        gbxProductividad.Size = new Size(1543, 280);
+        gbxProductividad.Size = new Size(1656, 280);
         gbxProductividad.TabIndex = 3;
         gbxProductividad.TabStop = false;
         gbxProductividad.Text = "Productividad por Veterinario";
@@ -203,7 +203,7 @@ partial class DashboardVeterinarioForm
         dgvProductividad.Location = new Point(30, 29);
         dgvProductividad.Name = "dgvProductividad";
         dgvProductividad.RowHeadersWidth = 51;
-        dgvProductividad.Size = new Size(1507, 240);
+        dgvProductividad.Size = new Size(1580, 240);
         dgvProductividad.TabIndex = 0;
         // 
         // btnExportarExcel
@@ -230,7 +230,7 @@ partial class DashboardVeterinarioForm
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(1667, 750);
+        ClientSize = new Size(1790, 750);
         Controls.Add(lblEstado);
         Controls.Add(btnExportarExcel);
         Controls.Add(gbxProductividad);

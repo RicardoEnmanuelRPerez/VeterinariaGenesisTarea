@@ -30,11 +30,9 @@ public partial class FacturasForm : Form
     {
         AplicarColoresVeterinaria();
         ConfigurarDataGridViews();
+        ConfigurarDataGridViewCitas();
         txtCantidad.Text = "1"; // Valor por defecto
         LimpiarDatosCita();
-        
-        // Suscribir evento una sola vez
-        cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
         
         await CargarCitasAsync();
     }
@@ -87,6 +85,10 @@ public partial class FacturasForm : Form
         dgvDetalles.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
         dgvDetalles.EnableHeadersVisualStyles = false;
         
+        // TextBox de búsqueda
+        txtBuscarPropietario.BackColor = Color.White;
+        txtBuscarPropietario.ForeColor = Color.Black;
+        
         // Labels de totales con colores destacados
         lblTotal.ForeColor = Color.FromArgb(27, 94, 32); // Verde oscuro
         lblSubtotal.ForeColor = Color.FromArgb(33, 150, 243); // Azul
@@ -107,6 +109,20 @@ public partial class FacturasForm : Form
         dgvDetalles.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
     }
 
+    private void ConfigurarDataGridViewCitas()
+    {
+        dgvCitas.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+        dgvCitas.AllowUserToAddRows = false;
+        dgvCitas.ReadOnly = true;
+        dgvCitas.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        dgvCitas.BackgroundColor = Color.FromArgb(250, 250, 250);
+        dgvCitas.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(240, 248, 255);
+        dgvCitas.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(76, 175, 80);
+        dgvCitas.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+        dgvCitas.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+        dgvCitas.EnableHeadersVisualStyles = false;
+    }
+
     private async Task CargarCitasAsync()
     {
         try
@@ -122,13 +138,9 @@ public partial class FacturasForm : Form
             
             System.Diagnostics.Debug.WriteLine($"Citas completadas sin factura encontradas: {citasCompletadas.Count}");
             
-            // Desconectar evento antes de modificar
-            cmbCita.SelectedIndexChanged -= CmbCita_SelectedIndexChanged;
-            
             if (citasCompletadas.Count == 0)
             {
-                cmbCita.DataSource = null;
-                cmbCita.Items.Clear();
+                dgvCitas.DataSource = null;
                 
                 // Mostrar información útil
                 var mensaje = "No hay citas completadas disponibles para generar factura.\n\n";
@@ -136,31 +148,23 @@ public partial class FacturasForm : Form
                 
                 lblEstado.Text = mensaje;
                 lblEstado.ForeColor = Color.Orange;
-                
-                // Reconectar evento
-                cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
                 return;
             }
             
-            // Crear lista de objetos anónimos para el ComboBox
-            var itemsCombo = citasCompletadas.Select(c => new { 
-                ID = c.ID_Cita, 
-                Descripcion = $"{c.Mascota ?? "N/A"} - {c.Fecha:dd/MM/yyyy} {c.Hora:hh\\:mm} - {c.Propietario ?? "N/A"}" 
-            }).ToList();
+            // Configurar el DataGridView con las citas
+            dgvCitas.DataSource = _citas;
             
-            // Configurar el ComboBox
-            cmbCita.DataSource = null; // Limpiar primero
-            cmbCita.Items.Clear();
-            cmbCita.DataSource = itemsCombo;
-            cmbCita.DisplayMember = "Descripcion";
-            cmbCita.ValueMember = "ID";
-            cmbCita.SelectedIndex = -1;
-            
-            // Reconectar evento DESPUÉS de configurar todo
-            cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
+            // Asegurar que la columna de ID_Cita esté visible
+            if (dgvCitas.Columns["ID_Cita"] != null)
+            {
+                dgvCitas.Columns["ID_Cita"].Visible = true;
+            }
             
             lblEstado.Text = $"✓ Cargadas {citasCompletadas.Count} cita(s) completada(s) sin factura";
             lblEstado.ForeColor = Color.Green;
+            
+            // Limpiar búsqueda
+            txtBuscarPropietario.Clear();
         }
         catch (Exception ex)
         {
@@ -174,18 +178,15 @@ public partial class FacturasForm : Form
             lblEstado.Text = $"Error: {ex.Message}";
             lblEstado.ForeColor = Color.Red;
             
-            // Asegurar que el ComboBox esté limpio
-            cmbCita.SelectedIndexChanged -= CmbCita_SelectedIndexChanged;
-            cmbCita.DataSource = null;
-            cmbCita.Items.Clear();
-            cmbCita.SelectedIndexChanged += CmbCita_SelectedIndexChanged;
+            // Asegurar que el DataGridView esté limpio
+            dgvCitas.DataSource = null;
         }
     }
 
-    private void CmbCita_SelectedIndexChanged(object? sender, EventArgs e)
+    private void DgvCitas_SelectionChanged(object? sender, EventArgs e)
     {
         // Verificar que hay una selección válida
-        if (cmbCita.SelectedIndex < 0 || cmbCita.SelectedItem == null)
+        if (dgvCitas.SelectedRows.Count == 0 || dgvCitas.SelectedRows[0] == null)
         {
             LimpiarDatosCita();
             return;
@@ -194,38 +195,8 @@ public partial class FacturasForm : Form
         try
         {
             // Obtener el ID de la cita seleccionada
-            int citaIdInt = -1;
-            
-            // Intentar obtener el valor usando SelectedValue (método preferido)
-            if (cmbCita.SelectedValue != null)
-            {
-                if (int.TryParse(cmbCita.SelectedValue.ToString(), out citaIdInt))
-                {
-                    // Valor obtenido correctamente
-                }
-                else if (cmbCita.SelectedValue is int idDirecto)
-                {
-                    citaIdInt = idDirecto;
-                }
-            }
-            
-            // Si no funcionó SelectedValue, intentar con reflexión
-            if (citaIdInt == -1 && cmbCita.SelectedItem != null)
-            {
-                var tipo = cmbCita.SelectedItem.GetType();
-                var propId = tipo.GetProperty("ID");
-                if (propId != null)
-                {
-                    var valor = propId.GetValue(cmbCita.SelectedItem);
-                    if (valor != null && int.TryParse(valor.ToString(), out var id))
-                    {
-                        citaIdInt = id;
-                    }
-                }
-            }
-            
-            // Si aún no tenemos el ID, salir
-            if (citaIdInt == -1)
+            var cell = dgvCitas.SelectedRows[0].Cells["ID_Cita"];
+            if (cell?.Value == null || !int.TryParse(cell.Value.ToString(), out var citaIdInt))
             {
                 LimpiarDatosCita();
                 lblEstado.Text = "No se pudo obtener el ID de la cita seleccionada";
@@ -264,6 +235,43 @@ public partial class FacturasForm : Form
         }
     }
 
+    private void TxtBuscarPropietario_TextChanged(object? sender, EventArgs e)
+    {
+        try
+        {
+            var textoBusqueda = txtBuscarPropietario.Text.Trim();
+            
+            if (string.IsNullOrWhiteSpace(textoBusqueda))
+            {
+                // Si no hay texto, mostrar todas las citas
+                dgvCitas.DataSource = _citas;
+            }
+            else
+            {
+                // Filtrar citas por nombre de propietario (búsqueda parcial, case-insensitive)
+                var citasFiltradas = _citas.Where(c => 
+                    (c.Propietario ?? "").Contains(textoBusqueda, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+                
+                dgvCitas.DataSource = citasFiltradas;
+                
+                lblEstado.Text = $"Se encontraron {citasFiltradas.Count} cita(s) para '{textoBusqueda}'";
+                lblEstado.ForeColor = citasFiltradas.Count > 0 ? Color.Green : Color.Orange;
+            }
+            
+            // Asegurar que la columna de ID_Cita esté visible
+            if (dgvCitas.Columns["ID_Cita"] != null)
+            {
+                dgvCitas.Columns["ID_Cita"].Visible = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            lblEstado.Text = $"Error al filtrar: {ex.Message}";
+            lblEstado.ForeColor = Color.Red;
+        }
+    }
+
     private async void btnRecargarCitas_Click(object? sender, EventArgs e)
     {
         btnRecargarCitas.Enabled = false;
@@ -290,30 +298,17 @@ public partial class FacturasForm : Form
     {
         try
         {
-            if (cmbCita.SelectedItem == null)
+            if (dgvCitas.SelectedRows.Count == 0 || dgvCitas.SelectedRows[0] == null)
             {
-                MessageBox.Show("Debe seleccionar una cita completada.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Debe seleccionar una cita completada del listado.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            var citaItem = cmbCita.SelectedItem;
-            if (citaItem == null)
+            // Obtener el ID de la cita seleccionada
+            var cell = dgvCitas.SelectedRows[0].Cells["ID_Cita"];
+            if (cell?.Value == null || !int.TryParse(cell.Value.ToString(), out var idCita))
             {
-                MessageBox.Show("Debe seleccionar una cita completada.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            
-            var prop = citaItem.GetType().GetProperty("ID");
-            if (prop == null)
-            {
-                MessageBox.Show("Error al obtener el ID de la cita.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            
-            var citaIdValue = prop.GetValue(citaItem);
-            if (citaIdValue == null || !int.TryParse(citaIdValue.ToString(), out var idCita))
-            {
-                MessageBox.Show("Error al obtener el ID de la cita.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Error al obtener el ID de la cita seleccionada.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
